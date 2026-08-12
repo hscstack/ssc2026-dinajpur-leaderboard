@@ -97,7 +97,8 @@
             </div>
           </div>
           <div
-            class="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 rounded-2xl border border-slate-200 bg-white p-3 sm:px-5 sm:py-5 shadow-sm text-center sm:text-left"
+            id="stat-schools-container"
+            class="cursor-pointer flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 rounded-2xl border border-slate-200 bg-white p-3 sm:px-5 sm:py-5 shadow-sm text-center sm:text-left hover:bg-slate-50 transition-colors"
           >
             <div
               class="flex h-8 w-8 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-lg sm:rounded-xl bg-teal-50 text-teal-600"
@@ -414,12 +415,12 @@
       class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 opacity-0 pointer-events-none transition-all duration-300 hidden p-4"
     >
       <div
-        class="bg-white rounded-3xl w-full max-w-md shadow-2xl transform translate-y-8 transition-all duration-300 overflow-hidden scale-95"
+        class="bg-white rounded-3xl w-full max-w-md shadow-2xl transform translate-y-8 transition-all duration-300 overflow-hidden scale-95 flex flex-col max-h-[90vh]"
         id="modal-content-inner"
       >
-        <div class="relative p-6 border-b border-slate-100 bg-slate-50/50">
+        <div class="relative p-6 border-b border-slate-100 bg-slate-50/50 shrink-0">
           <button
-            class="absolute top-5 right-5 h-8 w-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
+            class="absolute top-5 right-5 h-8 w-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors z-10"
             id="modal-close"
           >
             <svg
@@ -437,7 +438,9 @@
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
           </button>
-          <div class="pr-10">
+          
+          <!-- Student Content Header -->
+          <div id="modal-student-header" class="pr-10">
             <h3
               id="modal-name"
               class="text-xl font-black text-slate-900 mb-2 leading-tight"
@@ -450,108 +453,125 @@
               >PASSED</span
             >
           </div>
+
+          <!-- Schools Content Header -->
+          <div id="modal-schools-header" class="pr-10 hidden">
+             <h3 class="text-xl font-black text-slate-900 mb-2 leading-tight">
+               Participating Schools
+             </h3>
+             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide bg-teal-100 text-teal-700">List of Schools</span>
+          </div>
         </div>
-        <div class="p-6 space-y-4 bg-white">
-          <div
-            class="flex justify-between items-start pb-4 border-b border-slate-100"
-          >
-            <div class="flex items-center gap-2 text-slate-500 shrink-0 mt-0.5">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
-                <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
-              </svg>
-              <span class="font-bold text-sm">School</span>
-            </div>
-            <span
-              class="font-bold text-slate-900 text-right text-sm uppercase max-w-[70%]"
-              id="modal-school"
-              >School Name</span
+        
+        <div class="overflow-y-auto bg-white flex-1 p-6 space-y-4" id="modal-content-body">
+          <!-- Student Info Body -->
+          <div id="modal-student-body" class="space-y-4">
+            <div
+              class="flex justify-between items-start pb-4 border-b border-slate-100"
             >
+              <div class="flex items-center gap-2 text-slate-500 shrink-0 mt-0.5">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                  <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                </svg>
+                <span class="font-bold text-sm">School</span>
+              </div>
+              <span
+                class="font-bold text-slate-900 text-right text-sm uppercase max-w-[70%]"
+                id="modal-school"
+                >School Name</span
+              >
+            </div>
+            <div
+              class="flex justify-between items-center pb-4 border-b border-slate-100"
+              id="modal-roll-row"
+            >
+              <div class="flex items-center gap-2 text-slate-500">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <span class="font-bold text-sm">Roll</span>
+              </div>
+              <span class="font-bold text-slate-900 font-mono" id="modal-roll"
+                >-</span
+              >
+            </div>
+            <div
+              class="flex justify-between items-center pb-4 border-b border-slate-100"
+            >
+              <div class="flex items-center gap-2 text-slate-500">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                <span class="font-bold text-sm">GPA</span>
+              </div>
+              <span class="font-black text-slate-900 text-xl" id="modal-gpa"
+                >5.00</span
+              >
+            </div>
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-2 text-slate-500">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="8" r="7"></circle>
+                  <polyline
+                    points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"
+                  ></polyline>
+                </svg>
+                <span class="font-bold text-sm">Marks</span>
+              </div>
+              <span class="font-black text-slate-900 text-xl" id="modal-marks"
+                >1200</span
+              >
+            </div>
           </div>
-          <div
-            class="flex justify-between items-center pb-4 border-b border-slate-100"
-            id="modal-roll-row"
-          >
-            <div class="flex items-center gap-2 text-slate-500">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-              </svg>
-              <span class="font-bold text-sm">Roll</span>
-            </div>
-            <span class="font-bold text-slate-900 font-mono" id="modal-roll"
-              >-</span
-            >
-          </div>
-          <div
-            class="flex justify-between items-center pb-4 border-b border-slate-100"
-          >
-            <div class="flex items-center gap-2 text-slate-500">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-              </svg>
-              <span class="font-bold text-sm">GPA</span>
-            </div>
-            <span class="font-black text-slate-900 text-xl" id="modal-gpa"
-              >5.00</span
-            >
-          </div>
-          <div class="flex justify-between items-center">
-            <div class="flex items-center gap-2 text-slate-500">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <circle cx="12" cy="8" r="7"></circle>
-                <polyline
-                  points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"
-                ></polyline>
-              </svg>
-              <span class="font-bold text-sm">Marks</span>
-            </div>
-            <span class="font-black text-slate-900 text-xl" id="modal-marks"
-              >1200</span
-            >
+          
+          <!-- Schools List Body -->
+          <div id="modal-schools-body" class="space-y-2 hidden">
+             <!-- School list injected here -->
           </div>
         </div>
       </div>

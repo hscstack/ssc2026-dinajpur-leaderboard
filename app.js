@@ -12,6 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const statStudents = document.getElementById('stat-students');
   const statSchools = document.getElementById('stat-schools');
   const statGpa5 = document.getElementById('stat-gpa5');
+  const statSchoolsContainer = document.getElementById('stat-schools-container');
+
   
   const paginationContainer = document.getElementById('pagination-container');
   const pageSizeSelect = document.getElementById('page-size');
@@ -30,6 +32,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalRoll = document.getElementById('modal-roll');
   const modalGpa = document.getElementById('modal-gpa');
   const modalMarks = document.getElementById('modal-marks');
+  const modalStudentHeader = document.getElementById('modal-student-header');
+  const modalSchoolsHeader = document.getElementById('modal-schools-header');
+  const modalStudentBody = document.getElementById('modal-student-body');
+  const modalSchoolsBody = document.getElementById('modal-schools-body');
 
   const pageTitleText = document.getElementById('page-title-text');
 
@@ -64,6 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
       pageSizeSelect.addEventListener('change', handlePageSizeChange);
       btnPrev.addEventListener('click', () => changePage(-1));
       btnNext.addEventListener('click', () => changePage(1));
+      statSchoolsContainer.addEventListener('click', showSchoolsModal);
+
       
       // Modal Close
       modalClose.addEventListener('click', closeModal);
@@ -365,9 +373,44 @@ document.addEventListener('DOMContentLoaded', () => {
     window.scrollTo({ top: offset, behavior: 'smooth' });
   }
 
+  function showSchoolsModal() {
+    const uniqueSchools = new Set();
+    filteredData.forEach(s => {
+      if (s.school) uniqueSchools.add(s.school.toUpperCase());
+    });
+    const sortedSchools = Array.from(uniqueSchools).sort();
+
+    modalSchoolsBody.innerHTML = '';
+    sortedSchools.forEach(school => {
+      const el = document.createElement('div');
+      el.className = 'py-2 px-3 bg-slate-50 border border-slate-100 rounded-lg text-slate-800 font-semibold text-sm';
+      el.textContent = school;
+      modalSchoolsBody.appendChild(el);
+    });
+
+    modalStudentHeader.classList.add('hidden');
+    modalStudentBody.classList.add('hidden');
+    modalSchoolsHeader.classList.remove('hidden');
+    modalSchoolsBody.classList.remove('hidden');
+
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+      modal.classList.add('opacity-100');
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      modalContentInner.classList.remove('scale-95', 'translate-y-8');
+      modalContentInner.classList.add('scale-100', 'translate-y-0');
+    }, 10);
+  }
+
   function openModal(student) {
+    modalStudentHeader.classList.remove('hidden');
+    modalStudentBody.classList.remove('hidden');
+    modalSchoolsHeader.classList.add('hidden');
+    modalSchoolsBody.classList.add('hidden');
+
     modalName.textContent = student.name;
     const schoolName = student.school ? student.school.toUpperCase() : 'N/A';
+
     
     modalSchool.textContent = schoolName;
     if (schoolName === 'RZS') {
