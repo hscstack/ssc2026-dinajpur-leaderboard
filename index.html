@@ -1,206 +1,540 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SSC 2026 Students Leaderboard — Rangpur</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Instrument Sans', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-          }
-        }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SSC 2026 Students Leaderboard — Rangpur</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: [
+                "Instrument Sans",
+                "ui-sans-serif",
+                "system-ui",
+                "sans-serif",
+              ],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="bg-[#f8fafc] text-slate-900 font-sans antialiased">
+    <div class="px-6 pt-16 pb-3 text-center sm:pt-24 sm:pb-6">
+      <div class="mx-auto max-w-3xl">
+        <h1
+          class="mb-4 text-4xl font-black tracking-tight text-slate-900 sm:text-6xl lg:leading-[1.15]"
+        >
+          SSC 2026 <br />
+          <span
+            class="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent"
+            id="page-title-text"
+          >
+            Rangpur Leaderboard
+          </span>
+        </h1>
+
+        <p
+          class="mx-auto mb-10 max-w-xl text-base leading-relaxed font-medium text-slate-700/90 sm:text-lg"
+        >
+          Powered by
+          <a
+            href="https://hscstack.mvp.bd"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-indigo-600 hover:text-indigo-700 underline decoration-indigo-300 underline-offset-4 transition-colors"
+            >HSC Stack</a
+          >
+          — HSC শিক্ষার্থীদের জন্য একটি কমিউনিটি-ভিত্তিক Open Source ওয়েবসাইট
+        </p>
+
+        <div class="grid grid-cols-3 gap-2 sm:gap-4 mb-6">
+          <div
+            class="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 rounded-2xl border border-slate-200 bg-white p-3 sm:px-5 sm:py-5 shadow-sm text-center sm:text-left"
+          >
+            <div
+              class="flex h-8 w-8 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-lg sm:rounded-xl bg-indigo-50 text-indigo-600"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="h-4 w-4 sm:h-6 sm:w-6"
+              >
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </div>
+            <div>
+              <h3
+                class="text-[10px] sm:text-sm font-bold text-slate-500 uppercase tracking-wider leading-none mb-1 sm:mb-0"
+              >
+                Students
+              </h3>
+              <p
+                class="text-base sm:text-2xl font-black text-slate-900"
+                id="stat-students"
+              >
+                0
+              </p>
+            </div>
+          </div>
+          <div
+            class="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 rounded-2xl border border-slate-200 bg-white p-3 sm:px-5 sm:py-5 shadow-sm text-center sm:text-left"
+          >
+            <div
+              class="flex h-8 w-8 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-lg sm:rounded-xl bg-teal-50 text-teal-600"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="h-4 w-4 sm:h-6 sm:w-6"
+              >
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+              </svg>
+            </div>
+            <div>
+              <h3
+                class="text-[10px] sm:text-sm font-bold text-slate-500 uppercase tracking-wider leading-none mb-1 sm:mb-0"
+              >
+                Schools
+              </h3>
+              <p
+                class="text-base sm:text-2xl font-black text-slate-900"
+                id="stat-schools"
+              >
+                0
+              </p>
+            </div>
+          </div>
+          <div
+            class="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 rounded-2xl border border-slate-200 bg-white p-3 sm:px-5 sm:py-5 shadow-sm text-center sm:text-left"
+          >
+            <div
+              class="flex h-8 w-8 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-lg sm:rounded-xl bg-amber-50 text-amber-600"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="h-4 w-4 sm:h-6 sm:w-6"
+              >
+                <polygon
+                  points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                ></polygon>
+              </svg>
+            </div>
+            <div>
+              <h3
+                class="text-[10px] sm:text-sm font-bold text-slate-500 uppercase tracking-wider leading-none mb-1 sm:mb-0"
+              >
+                GPA 5.00
+              </h3>
+              <p
+                class="text-base sm:text-2xl font-black text-slate-900"
+                id="stat-gpa5"
+              >
+                0
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mx-auto max-w-lg relative mb-4">
+          <select
+            id="school-filter"
+            class="w-full appearance-none rounded-2xl border border-slate-200 bg-white/90 py-4 px-4 text-sm font-semibold shadow-sm backdrop-blur-md transition-all duration-300 focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10 focus:outline-none text-slate-700 cursor-pointer pr-12 truncate"
+          >
+            <option value="all">All Schools</option>
+          </select>
+          <div
+            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="m6 9 6 6 6-6" />
+            </svg>
+          </div>
+        </div>
+
+        <div class="group relative mx-auto max-w-lg mb-4">
+          <div
+            class="absolute -inset-0.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 opacity-0 blur-md transition duration-300 group-focus-within:opacity-10"
+          ></div>
+          <div class="relative">
+            <input
+              type="text"
+              id="search-input"
+              placeholder="Search for students..."
+              autocomplete="off"
+              class="w-full appearance-none rounded-2xl border border-slate-200 bg-white/90 py-4 pr-4 pl-12 text-sm font-semibold shadow-md shadow-slate-100/40 backdrop-blur-md transition-all duration-300 placeholder:text-slate-400/90 focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10 focus:outline-none"
+            />
+            <svg
+              class="pointer-events-none absolute top-[18px] left-4 h-5 w-5 text-slate-400 transition-colors duration-300 group-focus-within:text-teal-600"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <main class="mx-auto max-w-5xl px-4 pb-20 sm:px-6">
+      <div
+        id="loading-state"
+        class="text-center py-16 bg-white rounded-2xl border border-slate-200 shadow-sm"
+      >
+        <div
+          class="inline-block animate-spin w-8 h-8 border-4 border-slate-200 border-t-teal-600 rounded-full mb-4"
+        ></div>
+        <p class="text-slate-500 font-medium">Loading student data...</p>
+      </div>
+
+      <div
+        id="error-state"
+        class="text-center py-16 bg-white rounded-2xl border border-slate-200 shadow-sm hidden"
+      >
+        <div
+          class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600 mb-4"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <p class="text-slate-800 font-bold text-lg mb-1">Failed to load data</p>
+        <p class="text-slate-500 font-medium">Please try again later.</p>
+      </div>
+
+      <div
+        id="empty-state"
+        class="text-center py-16 bg-white rounded-2xl border border-slate-200 shadow-sm hidden"
+      >
+        <div
+          class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400 mb-4"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </div>
+        <p class="text-slate-800 font-bold text-lg mb-1">No students found</p>
+        <p class="text-slate-500 font-medium">
+          Try adjusting your search criteria.
+        </p>
+      </div>
+
+      <!-- Leaderboard container: switched to gap based approach for mobile -->
+      <div class="hidden flex-col gap-3" id="leaderboard-container">
+        <div
+          class="hidden sm:flex p-4 bg-white/50 border border-slate-200 rounded-xl text-xs font-bold text-slate-500 uppercase tracking-wider items-center"
+        >
+          <div class="w-16 text-center shrink-0">Rank</div>
+          <div class="flex-1 px-4">Student Info</div>
+          <div class="w-20 text-right shrink-0">GPA</div>
+          <div class="w-20 text-right shrink-0">Marks</div>
+          <div class="w-8 shrink-0"></div>
+        </div>
+        <div id="leaderboard-body" class="flex flex-col gap-3">
+          <!-- Student rows will be injected here -->
+        </div>
+      </div>
+
+      <div
+        class="flex flex-col sm:flex-row justify-between items-center mt-6 p-4 bg-white border border-slate-200 rounded-2xl shadow-sm gap-4 hidden"
+        id="pagination-container"
+      >
+        <div
+          class="flex items-center gap-2 text-slate-500 font-medium text-sm w-full sm:w-auto justify-center sm:justify-start"
+        >
+          <label for="page-size">Show:</label>
+          <select
+            id="page-size"
+            class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-slate-700 font-semibold focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 cursor-pointer"
+          >
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+        <div
+          class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end overflow-hidden"
+        >
+          <button
+            id="btn-prev"
+            class="px-3 sm:px-4 py-2 border border-slate-200 bg-white text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm active:scale-95 shrink-0"
+            disabled
+          >
+            Prev
+          </button>
+          <div
+            id="page-numbers"
+            class="flex gap-1 overflow-x-auto no-scrollbar flex-1 sm:flex-none justify-center px-1"
+          ></div>
+          <button
+            id="btn-next"
+            class="px-3 sm:px-4 py-2 border border-slate-200 bg-white text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm active:scale-95 shrink-0"
+            disabled
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <footer class="mt-8 py-8 border-t border-slate-200 text-center bg-white">
+      <div class="max-w-3xl mx-auto px-4 text-slate-500 text-sm font-medium">
+        <p>A concern of Tajim (RZS), Scrapped by Tahsin (RZS).</p>
+        <p class="mt-1">
+          Powered by
+          <a
+            href="https://hscstack.mvp.bd"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-indigo-600 hover:text-indigo-700 font-bold transition-colors"
+            >HSCStack</a
+          >.
+        </p>
+        <div class="mt-4 flex justify-center gap-4">
+          <a
+            href="privacy_policy.html"
+            class="hover:text-slate-900 transition-colors"
+            >Privacy Policy</a
+          >
+        </div>
+      </div>
+    </footer>
+
+    <!-- Modal -->
+    <div
+      id="student-modal"
+      class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 opacity-0 pointer-events-none transition-all duration-300 hidden p-4"
+    >
+      <div
+        class="bg-white rounded-3xl w-full max-w-md shadow-2xl transform translate-y-8 transition-all duration-300 overflow-hidden scale-95"
+        id="modal-content-inner"
+      >
+        <div class="relative p-6 border-b border-slate-100 bg-slate-50/50">
+          <button
+            class="absolute top-5 right-5 h-8 w-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors"
+            id="modal-close"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+          <div class="pr-10">
+            <h3
+              id="modal-name"
+              class="text-xl font-black text-slate-900 mb-2 leading-tight"
+            >
+              Student Name
+            </h3>
+            <span
+              id="modal-status"
+              class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide bg-emerald-100 text-emerald-700"
+              >PASSED</span
+            >
+          </div>
+        </div>
+        <div class="p-6 space-y-4 bg-white">
+          <div
+            class="flex justify-between items-start pb-4 border-b border-slate-100"
+          >
+            <div class="flex items-center gap-2 text-slate-500 shrink-0 mt-0.5">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+              </svg>
+              <span class="font-bold text-sm">School</span>
+            </div>
+            <span
+              class="font-bold text-slate-900 text-right text-sm uppercase max-w-[70%]"
+              id="modal-school"
+              >School Name</span
+            >
+          </div>
+          <div
+            class="flex justify-between items-center pb-4 border-b border-slate-100"
+            id="modal-roll-row"
+          >
+            <div class="flex items-center gap-2 text-slate-500">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <span class="font-bold text-sm">Roll</span>
+            </div>
+            <span class="font-bold text-slate-900 font-mono" id="modal-roll"
+              >-</span
+            >
+          </div>
+          <div
+            class="flex justify-between items-center pb-4 border-b border-slate-100"
+          >
+            <div class="flex items-center gap-2 text-slate-500">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+              <span class="font-bold text-sm">GPA</span>
+            </div>
+            <span class="font-black text-slate-900 text-xl" id="modal-gpa"
+              >5.00</span
+            >
+          </div>
+          <div class="flex justify-between items-center">
+            <div class="flex items-center gap-2 text-slate-500">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M12 2v20"></path>
+                <path
+                  d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+                ></path>
+              </svg>
+              <span class="font-bold text-sm">Marks</span>
+            </div>
+            <span class="font-black text-slate-900 text-xl" id="modal-marks"
+              >1200</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
       }
-    }
-  </script>
-</head>
-<body class="bg-[#f8fafc] text-slate-900 font-sans antialiased">
-  <div class="px-6 pt-16 pb-3 text-center sm:pt-24 sm:pb-6">
-    <div class="mx-auto max-w-3xl">
-      <h1 class="mb-4 text-4xl font-black tracking-tight text-slate-900 sm:text-6xl lg:leading-[1.15]">
-        SSC 2026 <br />
-        <span class="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent" id="page-title-text">
-          Rangpur Leaderboard
-        </span>
-      </h1>
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+    </style>
 
-      <p class="mx-auto mb-10 max-w-xl text-base leading-relaxed font-medium text-slate-700/90 sm:text-lg">
-        Powered by <a href="https://hscstack.mvp.bd" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:text-indigo-700 underline decoration-indigo-300 underline-offset-4 transition-colors">HSC Stack</a> — HSC শিক্ষার্থীদের জন্য একটি কমিউনিটি-ভিত্তিক Open Source ওয়েবসাইট
-      </p>
-
-      <div class="grid grid-cols-3 gap-2 sm:gap-4 mb-6">
-        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 rounded-2xl border border-slate-200 bg-white p-3 sm:px-5 sm:py-5 shadow-sm text-center sm:text-left">
-          <div class="flex h-8 w-8 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-lg sm:rounded-xl bg-indigo-50 text-indigo-600">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 sm:h-6 sm:w-6"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-          </div>
-          <div>
-            <h3 class="text-[10px] sm:text-sm font-bold text-slate-500 uppercase tracking-wider leading-none mb-1 sm:mb-0">Students</h3>
-            <p class="text-base sm:text-2xl font-black text-slate-900" id="stat-students">0</p>
-          </div>
-        </div>
-        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 rounded-2xl border border-slate-200 bg-white p-3 sm:px-5 sm:py-5 shadow-sm text-center sm:text-left">
-          <div class="flex h-8 w-8 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-lg sm:rounded-xl bg-teal-50 text-teal-600">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 sm:h-6 sm:w-6"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-          </div>
-          <div>
-            <h3 class="text-[10px] sm:text-sm font-bold text-slate-500 uppercase tracking-wider leading-none mb-1 sm:mb-0">Schools</h3>
-            <p class="text-base sm:text-2xl font-black text-slate-900" id="stat-schools">0</p>
-          </div>
-        </div>
-        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 rounded-2xl border border-slate-200 bg-white p-3 sm:px-5 sm:py-5 shadow-sm text-center sm:text-left">
-          <div class="flex h-8 w-8 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-lg sm:rounded-xl bg-amber-50 text-amber-600">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 sm:h-6 sm:w-6"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-          </div>
-          <div>
-            <h3 class="text-[10px] sm:text-sm font-bold text-slate-500 uppercase tracking-wider leading-none mb-1 sm:mb-0">GPA 5.00</h3>
-            <p class="text-base sm:text-2xl font-black text-slate-900" id="stat-gpa5">0</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="mx-auto max-w-lg relative mb-4">
-        <select id="school-filter" class="w-full appearance-none rounded-2xl border border-slate-200 bg-white/90 py-4 px-4 text-sm font-semibold shadow-sm backdrop-blur-md transition-all duration-300 focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10 focus:outline-none text-slate-700 cursor-pointer pr-12 truncate">
-          <option value="all">All Schools</option>
-        </select>
-        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-        </div>
-      </div>
-
-      <div class="group relative mx-auto max-w-lg mb-4">
-        <div class="absolute -inset-0.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 opacity-0 blur-md transition duration-300 group-focus-within:opacity-10"></div>
-        <div class="relative">
-          <input type="text" id="search-input" placeholder="Search for students..." autocomplete="off" class="w-full appearance-none rounded-2xl border border-slate-200 bg-white/90 py-4 pr-4 pl-12 text-sm font-semibold shadow-md shadow-slate-100/40 backdrop-blur-md transition-all duration-300 placeholder:text-slate-400/90 focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10 focus:outline-none">
-          <svg class="pointer-events-none absolute top-[18px] left-4 h-5 w-5 text-slate-400 transition-colors duration-300 group-focus-within:text-teal-600" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <main class="mx-auto max-w-5xl px-4 pb-20 sm:px-6">
-    <div id="loading-state" class="text-center py-16 bg-white rounded-2xl border border-slate-200 shadow-sm">
-      <div class="inline-block animate-spin w-8 h-8 border-4 border-slate-200 border-t-teal-600 rounded-full mb-4"></div>
-      <p class="text-slate-500 font-medium">Loading student data...</p>
-    </div>
-    
-    <div id="error-state" class="text-center py-16 bg-white rounded-2xl border border-slate-200 shadow-sm hidden">
-      <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600 mb-4">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-      </div>
-      <p class="text-slate-800 font-bold text-lg mb-1">Failed to load data</p>
-      <p class="text-slate-500 font-medium">Please try again later.</p>
-    </div>
-    
-    <div id="empty-state" class="text-center py-16 bg-white rounded-2xl border border-slate-200 shadow-sm hidden">
-      <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400 mb-4">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      </div>
-      <p class="text-slate-800 font-bold text-lg mb-1">No students found</p>
-      <p class="text-slate-500 font-medium">Try adjusting your search criteria.</p>
-    </div>
-
-    <!-- Leaderboard container: switched to gap based approach for mobile -->
-    <div class="hidden flex-col gap-3" id="leaderboard-container">
-      <div class="hidden sm:flex p-4 bg-white/50 border border-slate-200 rounded-xl text-xs font-bold text-slate-500 uppercase tracking-wider items-center">
-        <div class="w-16 text-center shrink-0">Rank</div>
-        <div class="flex-1 px-4">Student Info</div>
-        <div class="w-20 text-right shrink-0">GPA</div>
-        <div class="w-20 text-right shrink-0">Marks</div>
-        <div class="w-8 shrink-0"></div>
-      </div>
-      <div id="leaderboard-body" class="flex flex-col gap-3">
-        <!-- Student rows will be injected here -->
-      </div>
-    </div>
-
-    <div class="flex flex-col sm:flex-row justify-between items-center mt-6 p-4 bg-white border border-slate-200 rounded-2xl shadow-sm gap-4 hidden" id="pagination-container">
-      <div class="flex items-center gap-2 text-slate-500 font-medium text-sm w-full sm:w-auto justify-center sm:justify-start">
-        <label for="page-size">Show:</label>
-        <select id="page-size" class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-slate-700 font-semibold focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 cursor-pointer">
-          <option value="25">25</option>
-          <option value="50">50</option>
-          <option value="100">100</option>
-        </select>
-      </div>
-      <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end overflow-hidden">
-        <button id="btn-prev" class="px-3 sm:px-4 py-2 border border-slate-200 bg-white text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm active:scale-95 shrink-0" disabled>Prev</button>
-        <div id="page-numbers" class="flex gap-1 overflow-x-auto no-scrollbar flex-1 sm:flex-none justify-center px-1"></div>
-        <button id="btn-next" class="px-3 sm:px-4 py-2 border border-slate-200 bg-white text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm active:scale-95 shrink-0" disabled>Next</button>
-      </div>
-    </div>
-  </main>
-
-  <footer class="mt-8 py-8 border-t border-slate-200 text-center bg-white">
-    <div class="max-w-3xl mx-auto px-4 text-slate-500 text-sm font-medium">
-      <p>A concern of Tajim, Data provided by Tahsin.</p>
-      <p class="mt-1">Powered by <a href="https://hscstack.mvp.bd" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:text-indigo-700 font-bold transition-colors">HSCStack</a>.</p>
-      <div class="mt-4 flex justify-center gap-4">
-        <a href="privacy_policy.html" class="hover:text-slate-900 transition-colors">Privacy Policy</a>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Modal -->
-  <div id="student-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 opacity-0 pointer-events-none transition-all duration-300 hidden p-4">
-    <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl transform translate-y-8 transition-all duration-300 overflow-hidden scale-95" id="modal-content-inner">
-      <div class="relative p-6 border-b border-slate-100 bg-slate-50/50">
-        <button class="absolute top-5 right-5 h-8 w-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors" id="modal-close">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        </button>
-        <div class="pr-10">
-          <h3 id="modal-name" class="text-xl font-black text-slate-900 mb-2 leading-tight">Student Name</h3>
-          <span id="modal-status" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide bg-emerald-100 text-emerald-700">PASSED</span>
-        </div>
-      </div>
-      <div class="p-6 space-y-4 bg-white">
-        <div class="flex justify-between items-start pb-4 border-b border-slate-100">
-          <div class="flex items-center gap-2 text-slate-500 shrink-0 mt-0.5">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
-            <span class="font-bold text-sm">School</span>
-          </div>
-          <span class="font-bold text-slate-900 text-right text-sm uppercase max-w-[70%]" id="modal-school">School Name</span>
-        </div>
-        <div class="flex justify-between items-center pb-4 border-b border-slate-100" id="modal-roll-row">
-          <div class="flex items-center gap-2 text-slate-500">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-            <span class="font-bold text-sm">Roll</span>
-          </div>
-          <span class="font-bold text-slate-900 font-mono" id="modal-roll">-</span>
-        </div>
-        <div class="flex justify-between items-center pb-4 border-b border-slate-100">
-          <div class="flex items-center gap-2 text-slate-500">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-            <span class="font-bold text-sm">GPA</span>
-          </div>
-          <span class="font-black text-slate-900 text-xl" id="modal-gpa">5.00</span>
-        </div>
-        <div class="flex justify-between items-center">
-          <div class="flex items-center gap-2 text-slate-500">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-            <span class="font-bold text-sm">Marks</span>
-          </div>
-          <span class="font-black text-slate-900 text-xl" id="modal-marks">1200</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <style>
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-    .no-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
-  </style>
-
-  <script src="app.js"></script>
-</body>
+    <script src="app.js"></script>
+  </body>
 </html>
