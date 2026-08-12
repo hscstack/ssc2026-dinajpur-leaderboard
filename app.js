@@ -39,6 +39,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const pageTitleText = document.getElementById('page-title-text');
 
+  const takedownBtn = document.getElementById('takedown-btn');
+  const takedownModal = document.getElementById('takedown-modal');
+  const takedownModalInner = document.getElementById('takedown-modal-inner');
+  const takedownClose = document.getElementById('takedown-close');
+
   // State
   let rawData = [];
   let filteredData = [];
@@ -79,8 +84,27 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target === modal) closeModal();
       });
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
+        if (e.key === 'Escape') {
+          if (!modal.classList.contains('hidden')) closeModal();
+          if (!takedownModal.classList.contains('hidden')) closeTakedownModal();
+        }
       });
+
+      // Takedown Modal
+      if (takedownBtn) {
+        takedownBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          openTakedownModal();
+        });
+      }
+      if (takedownClose) {
+        takedownClose.addEventListener('click', closeTakedownModal);
+      }
+      if (takedownModal) {
+        takedownModal.addEventListener('click', (e) => {
+          if (e.target === takedownModal) closeTakedownModal();
+        });
+      }
       
     } catch (error) {
       console.error('Error loading data:', error);
@@ -456,6 +480,27 @@ document.addEventListener('DOMContentLoaded', () => {
     
     setTimeout(() => {
       modal.classList.add('hidden');
+    }, 300);
+  }
+
+  function openTakedownModal() {
+    takedownModal.classList.remove('hidden');
+    setTimeout(() => {
+      takedownModal.classList.add('opacity-100');
+      takedownModal.classList.remove('opacity-0', 'pointer-events-none');
+      takedownModalInner.classList.remove('scale-95', 'translate-y-8');
+      takedownModalInner.classList.add('scale-100', 'translate-y-0');
+    }, 10);
+  }
+
+  function closeTakedownModal() {
+    takedownModal.classList.remove('opacity-100');
+    takedownModal.classList.add('opacity-0', 'pointer-events-none');
+    takedownModalInner.classList.add('scale-95', 'translate-y-8');
+    takedownModalInner.classList.remove('scale-100', 'translate-y-0');
+    
+    setTimeout(() => {
+      takedownModal.classList.add('hidden');
     }, 300);
   }
 

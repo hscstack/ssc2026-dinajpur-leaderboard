@@ -399,6 +399,13 @@
             class="flex items-center gap-4 text-sm font-semibold text-slate-500"
           >
             <a
+              href="#"
+              id="takedown-btn"
+              class="hover:text-slate-900 transition-colors"
+            >
+              Takedown My Result
+            </a>
+            <a
               href="privacy_policy.html"
               class="hover:text-slate-900 transition-colors"
             >
@@ -573,6 +580,36 @@
           <div id="modal-schools-body" class="space-y-2 hidden">
              <!-- School list injected here -->
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Takedown Modal -->
+    <div
+      id="takedown-modal"
+      class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 opacity-0 pointer-events-none transition-all duration-300 hidden p-4"
+    >
+      <div
+        class="bg-white rounded-3xl w-full max-w-sm shadow-2xl transform translate-y-8 transition-all duration-300 overflow-hidden scale-95 flex flex-col p-6 text-center"
+        id="takedown-modal-inner"
+      >
+        <h3 class="text-xl font-black text-slate-900 mb-2">Takedown Request</h3>
+        <p class="text-slate-600 mb-6 font-medium">Contact me to take down your result from our site.</p>
+        <div class="flex flex-col gap-3">
+          <a
+            href="https://facebook.com/trtajim"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-md hover:bg-indigo-700 transition-colors"
+          >
+            Contact
+          </a>
+          <button
+            id="takedown-close"
+            class="w-full py-3 bg-slate-100 text-slate-700 font-bold rounded-xl hover:bg-slate-200 transition-colors"
+          >
+            Cancel
+          </button>
         </div>
       </div>
     </div>
