@@ -272,7 +272,9 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="flex justify-between items-start w-full">
             <div class="flex flex-col gap-1 pr-2">
               <div class="font-bold text-slate-800 text-base leading-snug group-hover:text-indigo-600 transition-colors break-words">${escapeHTML(student.name)}</div>
-              <div class="text-slate-500 text-xs font-semibold uppercase leading-tight line-clamp-2">${escapeHTML(safeSchool)}</div>
+              <div class="text-xs uppercase leading-tight line-clamp-2 ${safeSchool === 'RZS' ? 'font-extrabold text-white bg-gradient-to-r from-violet-600 to-indigo-600 px-2 py-0.5 rounded shadow-sm inline-block w-max tracking-wide' : 'font-semibold text-slate-500'}">
+                ${escapeHTML(safeSchool)}
+              </div>
             </div>
             <div class="shrink-0 flex items-center justify-center w-8 h-8 rounded-lg font-bold text-sm ${mobileRankBadge}">
               #${student.displayRank}
@@ -299,7 +301,9 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
           <div class="flex-1 px-4 min-w-0">
             <div class="font-bold text-slate-800 mb-0.5 text-base truncate group-hover:text-indigo-600 transition-colors">${escapeHTML(student.name)}</div>
-            <div class="text-slate-500 text-sm font-semibold uppercase truncate">${escapeHTML(safeSchool)}</div>
+            <div class="text-sm uppercase truncate ${safeSchool === 'RZS' ? 'font-extrabold text-white bg-gradient-to-r from-violet-600 to-indigo-600 px-2.5 py-0.5 rounded shadow-sm w-max inline-block tracking-wide' : 'font-semibold text-slate-500'}">
+              ${escapeHTML(safeSchool)}
+            </div>
           </div>
           <div class="w-20 text-right font-bold text-slate-700 text-base shrink-0">${safeGpa}</div>
           <div class="w-20 text-right font-black text-slate-900 text-base shrink-0">${student.mark}</div>
@@ -363,7 +367,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function openModal(student) {
     modalName.textContent = student.name;
-    modalSchool.textContent = student.school ? student.school.toUpperCase() : 'N/A';
+    const schoolName = student.school ? student.school.toUpperCase() : 'N/A';
+    
+    modalSchool.textContent = schoolName;
+    if (schoolName === 'RZS') {
+      modalSchool.className = 'font-extrabold text-white bg-gradient-to-r from-violet-600 to-indigo-600 px-3 py-1 rounded shadow-sm uppercase tracking-wider text-sm inline-block';
+    } else {
+      modalSchool.className = 'text-slate-500 font-semibold uppercase tracking-wider text-sm';
+    }
     
     modalGpa.textContent = typeof student.gpa === 'number' ? student.gpa.toFixed(2) : student.gpa;
     modalMarks.textContent = student.mark;
