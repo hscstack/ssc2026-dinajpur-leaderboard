@@ -1,5 +1,7 @@
 # SSC 2026 Rangpur Leaderboard
 
+![SSC 2026 Rangpur Leaderboard](screenshots/image.png)
+
 This website is a community-based leaderboard for secondary school students in the Rangpur region who completed their SSC exams in 2026. It is designed to help students, parents, and schools easily view, search, and compare academic performances in a clean and organized interface.
 
 ## Key Features
