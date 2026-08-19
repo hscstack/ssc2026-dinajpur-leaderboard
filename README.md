@@ -22,6 +22,14 @@ This website is a community-based leaderboard for secondary school students in t
 - Detailed Student Profiles: Click on any student to view details such as their school, exam status, overall GPA, and total marks.
 - Takedown Request Option: If you wish to have your exam details removed from the public leaderboard, you can easily submit a takedown request.
 
+## Achievements
+
+<div align="center">
+  <img src="screenshots/stats.png" alt="SSC 2026 Rangpur Leaderboard - Stats" width="80%" />
+</div>
+
+Gained over 450 users with 1,000+ visits in just 4 days.
+
 ## Data Source
 
 The information displayed on this website is compiled from publicly accessible exam results. It does not claim official ownership of the academic data and is not affiliated with the Education Board.
