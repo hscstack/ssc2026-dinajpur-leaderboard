@@ -1,4 +1,4 @@
-# SSC 2026 Dinajpur Boar Leaderboard
+# SSC 2026 Dinajpur Board Leaderboard
 
 <div align="center">
   <img src="screenshots/image.png" alt="SSC 2026 Dinajpur Board Leaderboard - Overview" width="100%" />
