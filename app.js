@@ -44,6 +44,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const takedownModalInner = document.getElementById('takedown-modal-inner');
   const takedownClose = document.getElementById('takedown-close');
 
+  const newSchoolBtn = document.getElementById('new-school-btn');
+  const newSchoolModal = document.getElementById('new-school-modal');
+  const newSchoolModalInner = document.getElementById('new-school-modal-inner');
+  const newSchoolClose = document.getElementById('new-school-close');
+
   // State
   let rawData = [];
   let filteredData = [];
@@ -87,6 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Escape') {
           if (!modal.classList.contains('hidden')) closeModal();
           if (!takedownModal.classList.contains('hidden')) closeTakedownModal();
+          if (!newSchoolModal.classList.contains('hidden')) closeNewSchoolModal();
         }
       });
 
@@ -103,6 +109,22 @@ document.addEventListener('DOMContentLoaded', () => {
       if (takedownModal) {
         takedownModal.addEventListener('click', (e) => {
           if (e.target === takedownModal) closeTakedownModal();
+        });
+      }
+
+      // New School Modal
+      if (newSchoolBtn) {
+        newSchoolBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          openNewSchoolModal();
+        });
+      }
+      if (newSchoolClose) {
+        newSchoolClose.addEventListener('click', closeNewSchoolModal);
+      }
+      if (newSchoolModal) {
+        newSchoolModal.addEventListener('click', (e) => {
+          if (e.target === newSchoolModal) closeNewSchoolModal();
         });
       }
       
@@ -503,6 +525,27 @@ document.addEventListener('DOMContentLoaded', () => {
     
     setTimeout(() => {
       takedownModal.classList.add('hidden');
+    }, 300);
+  }
+
+  function openNewSchoolModal() {
+    newSchoolModal.classList.remove('hidden');
+    setTimeout(() => {
+      newSchoolModal.classList.add('opacity-100');
+      newSchoolModal.classList.remove('opacity-0', 'pointer-events-none');
+      newSchoolModalInner.classList.remove('scale-95', 'translate-y-8');
+      newSchoolModalInner.classList.add('scale-100', 'translate-y-0');
+    }, 10);
+  }
+
+  function closeNewSchoolModal() {
+    newSchoolModal.classList.remove('opacity-100');
+    newSchoolModal.classList.add('opacity-0', 'pointer-events-none');
+    newSchoolModalInner.classList.add('scale-95', 'translate-y-8');
+    newSchoolModalInner.classList.remove('scale-100', 'translate-y-0');
+    
+    setTimeout(() => {
+      newSchoolModal.classList.add('hidden');
     }, 300);
   }
 
