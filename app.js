@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Sort by global rank
       filteredData.sort((a, b) => a.globalRank - b.globalRank);
       
-      if (pageTitleText) pageTitleText.textContent = `Rangpur Leaderboard`;
+      if (pageTitleText) pageTitleText.textContent = `Dinajpur Board Leaderboard`;
     }
 
     updateStats();
