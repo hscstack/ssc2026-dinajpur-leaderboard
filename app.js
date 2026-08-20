@@ -293,6 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       const safeSchool = student.school ? student.school.toUpperCase() : 'N/A';
+      const isRZS = safeSchool === 'RANGPUR ZILLA SCHOOL';
       const safeGpa = typeof student.gpa === 'number' ? student.gpa.toFixed(2) : student.gpa;
       
       // Mobile-friendly card format for small screens, table row for large screens
@@ -304,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="flex justify-between items-start w-full">
             <div class="flex flex-col gap-1 pr-2">
               <div class="font-bold text-slate-800 text-base leading-snug group-hover:text-indigo-600 transition-colors break-words">${escapeHTML(student.name)}</div>
-              <div class="text-xs uppercase leading-tight line-clamp-2 ${safeSchool === 'RZS' ? 'font-extrabold text-white bg-gradient-to-r from-violet-600 to-indigo-600 px-2 py-0.5 rounded shadow-sm inline-block w-max tracking-wide' : 'font-semibold text-slate-500'}">
+              <div class="text-xs uppercase leading-tight line-clamp-2 ${isRZS ? 'font-extrabold text-white bg-gradient-to-r from-violet-600 to-indigo-600 px-2 py-0.5 rounded shadow-sm inline-block w-max tracking-wide' : 'font-semibold text-slate-500'}">
                 ${escapeHTML(safeSchool)}
               </div>
             </div>
@@ -333,7 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
           <div class="flex-1 px-4 min-w-0">
             <div class="font-bold text-slate-800 mb-0.5 text-base truncate group-hover:text-indigo-600 transition-colors">${escapeHTML(student.name)}</div>
-            <div class="text-sm uppercase truncate ${safeSchool === 'RZS' ? 'font-extrabold text-white bg-gradient-to-r from-violet-600 to-indigo-600 px-2.5 py-0.5 rounded shadow-sm w-max inline-block tracking-wide' : 'font-semibold text-slate-500'}">
+            <div class="text-sm uppercase truncate ${isRZS ? 'font-extrabold text-white bg-gradient-to-r from-violet-600 to-indigo-600 px-2.5 py-0.5 rounded shadow-sm w-max inline-block tracking-wide' : 'font-semibold text-slate-500'}">
               ${escapeHTML(safeSchool)}
             </div>
           </div>
@@ -434,10 +435,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     modalName.textContent = student.name;
     const schoolName = student.school ? student.school.toUpperCase() : 'N/A';
+    const isRZS = schoolName === 'RANGPUR ZILLA SCHOOL';
 
     
     modalSchool.textContent = schoolName;
-    if (schoolName === 'RZS') {
+    if (isRZS) {
       modalSchool.className = 'font-extrabold text-white bg-gradient-to-r from-violet-600 to-indigo-600 px-3 py-1 rounded shadow-sm uppercase tracking-wider text-sm inline-block';
     } else {
       modalSchool.className = 'text-slate-500 font-semibold uppercase tracking-wider text-sm';
