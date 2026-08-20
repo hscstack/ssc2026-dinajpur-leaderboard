@@ -440,9 +440,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     modalSchool.textContent = schoolName;
     if (isRZS) {
-      modalSchool.className = 'font-extrabold text-white bg-gradient-to-r from-violet-600 to-indigo-600 px-3 py-1 rounded shadow-sm uppercase tracking-wider text-sm inline-block';
+      modalSchool.className = 'font-extrabold text-white bg-gradient-to-r from-violet-600 to-indigo-600 px-3 py-1 rounded shadow-sm uppercase tracking-wider text-sm inline-block break-words text-right max-w-[70%]';
     } else {
-      modalSchool.className = 'text-slate-500 font-semibold uppercase tracking-wider text-sm';
+      modalSchool.className = 'text-slate-500 font-semibold uppercase tracking-wider text-sm break-words text-right max-w-[70%]';
     }
     
     modalGpa.textContent = typeof student.gpa === 'number' ? student.gpa.toFixed(2) : student.gpa;
