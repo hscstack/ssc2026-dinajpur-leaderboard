@@ -28,7 +28,7 @@ This website is a community-based leaderboard for secondary school students in t
   <img src="screenshots/stats.png" alt="SSC 2026 Dinajpur Boar Leaderboard - Stats" width="80%" />
 </div>
 
-Gained over 450 users with 1,000+ visits in just 4 days.
+Gained over 1,100 users with 2,700+ visits in just 7 days.
 
 ## Data Source
 
