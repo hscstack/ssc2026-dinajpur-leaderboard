@@ -1,9 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
   // DOM Elements
   const searchInput = document.getElementById('search-input');
-  const districtFilter = document.getElementById('district-filter');
-  const schoolFilter = document.getElementById('school-filter');
-  const groupFilter = document.getElementById('group-filter');
+  const btnSelectDistrict = document.getElementById('btn-select-district');
+  const btnSelectSchool = document.getElementById('btn-select-school');
+  const btnSelectGroup = document.getElementById('btn-select-group');
+  
+  const labelDistrict = document.getElementById('label-district');
+  const labelSchool = document.getElementById('label-school');
+  const labelGroup = document.getElementById('label-group');
+
+  // Selection Modal Elements
+  const selectionModal = document.getElementById('selection-modal');
+  const selectionModalInner = document.getElementById('selection-modal-inner');
+  const selectionModalClose = document.getElementById('selection-modal-close');
+  const selectionModalTitle = document.getElementById('selection-modal-title');
+  const selectionModalSearchContainer = document.getElementById('selection-modal-search-container');
+  const selectionModalSearch = document.getElementById('selection-modal-search');
+  const selectionModalBody = document.getElementById('selection-modal-body');
+
   const leaderboardBody = document.getElementById('leaderboard-body');
   const leaderboardContainer = document.getElementById('leaderboard-container');
   
@@ -61,6 +75,14 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentPage = 1;
   let itemsPerPage = 25;
 
+  let selectedDistrict = 'all';
+  let selectedSchool = 'all';
+  let selectedGroup = 'all';
+
+  let districtsList = [];
+  let schoolsList = [];
+  let groupsList = [];
+
   // Initialization
   init();
 
@@ -100,9 +122,14 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Event Listeners
       searchInput.addEventListener('input', handleFilterChange);
-      districtFilter.addEventListener('change', handleFilterChange);
-      schoolFilter.addEventListener('change', handleFilterChange);
-      groupFilter.addEventListener('change', handleFilterChange);
+      btnSelectDistrict.addEventListener('click', () => openSelectionModal('district'));
+      btnSelectSchool.addEventListener('click', () => openSelectionModal('school'));
+      btnSelectGroup.addEventListener('click', () => openSelectionModal('group'));
+
+      selectionModalClose.addEventListener('click', closeSelectionModal);
+      selectionModal.addEventListener('click', (e) => {
+        if (e.target === selectionModal) closeSelectionModal();
+      });
       pageSizeSelect.addEventListener('change', handlePageSizeChange);
       btnPrev.addEventListener('click', () => changePage(-1));
       btnNext.addEventListener('click', () => changePage(1));
@@ -120,6 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if (!modal.classList.contains('hidden')) closeModal();
           if (!takedownModal.classList.contains('hidden')) closeTakedownModal();
           if (!newSchoolModal.classList.contains('hidden')) closeNewSchoolModal();
+          if (!selectionModal.classList.contains('hidden')) closeSelectionModal();
         }
       });
 
@@ -218,30 +246,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // 4. Populate filter dropdowns
-    const sortedDistricts = Array.from(uniqueDistricts).sort();
-    sortedDistricts.forEach(district => {
-      const option = document.createElement('option');
-      option.value = district;
-      option.textContent = district;
-      districtFilter.appendChild(option);
-    });
-
-    const sortedSchools = Array.from(uniqueSchools).sort();
-    sortedSchools.forEach(school => {
-      const option = document.createElement('option');
-      option.value = school;
-      option.textContent = school;
-      schoolFilter.appendChild(option);
-    });
-
-    const sortedGroups = Array.from(uniqueGroups).sort();
-    sortedGroups.forEach(group => {
-      const option = document.createElement('option');
-      option.value = group;
-      option.textContent = group;
-      groupFilter.appendChild(option);
-    });
+    // 4. Save sorted lists for modal selection
+    districtsList = Array.from(uniqueDistricts).sort();
+    schoolsList = Array.from(uniqueSchools).sort();
+    groupsList = Array.from(uniqueGroups).sort();
   }
 
   function handleFilterChange() {
@@ -257,9 +265,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function applyFilters() {
     const searchTerm = searchInput.value.toLowerCase().trim();
-    const selectedSchool = schoolFilter.value;
-    const selectedDistrict = districtFilter.value;
-    const selectedGroup = groupFilter.value;
 
     filteredData = rawData.filter(student => {
       const matchName = !searchTerm || (student.name && student.name.toLowerCase().includes(searchTerm));
@@ -540,6 +545,104 @@ document.addEventListener('DOMContentLoaded', () => {
       modalContentInner.classList.remove('scale-95', 'translate-y-8');
       modalContentInner.classList.add('scale-100', 'translate-y-0');
     }, 10);
+  }
+
+  let currentSelectionType = '';
+
+  function openSelectionModal(type) {
+    currentSelectionType = type;
+    let list = [];
+    let title = '';
+    
+    if (type === 'district') {
+      title = 'Select District';
+      list = districtsList;
+      selectionModalSearchContainer.classList.remove('hidden');
+    } else if (type === 'school') {
+      title = 'Select School';
+      list = schoolsList;
+      selectionModalSearchContainer.classList.remove('hidden');
+    } else if (type === 'group') {
+      title = 'Select Group';
+      list = groupsList;
+      selectionModalSearchContainer.classList.add('hidden');
+    }
+    
+    selectionModalTitle.textContent = title;
+    selectionModalSearch.value = '';
+    renderSelectionList(list);
+    
+    // Search functionality inside modal
+    selectionModalSearch.oninput = (e) => {
+      const q = e.target.value.toLowerCase();
+      const filtered = list.filter(item => item.toLowerCase().includes(q));
+      renderSelectionList(filtered);
+    };
+
+    selectionModal.classList.remove('hidden');
+    setTimeout(() => {
+      selectionModal.classList.add('opacity-100');
+      selectionModal.classList.remove('opacity-0', 'pointer-events-none');
+      selectionModalInner.classList.remove('scale-95', 'translate-y-8');
+      selectionModalInner.classList.add('scale-100', 'translate-y-0');
+      if (type !== 'group') selectionModalSearch.focus();
+    }, 10);
+  }
+
+  function renderSelectionList(list) {
+    selectionModalBody.innerHTML = '';
+    
+    // Add "All" option
+    const allBtn = document.createElement('button');
+    allBtn.className = 'w-full text-left py-3 px-4 bg-slate-50 border border-slate-100 rounded-xl text-slate-800 font-bold text-sm hover:bg-teal-50 hover:text-teal-700 hover:border-teal-200 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500/20';
+    allBtn.textContent = \`All \${currentSelectionType.charAt(0).toUpperCase() + currentSelectionType.slice(1)}s\`;
+    allBtn.onclick = () => selectOption('all');
+    selectionModalBody.appendChild(allBtn);
+    
+    list.forEach(item => {
+      const btn = document.createElement('button');
+      btn.className = 'w-full text-left py-3 px-4 bg-white border border-slate-100 rounded-xl text-slate-700 font-semibold text-sm hover:bg-slate-50 hover:border-slate-300 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/20 truncate';
+      btn.textContent = item;
+      btn.title = item;
+      btn.onclick = () => selectOption(item);
+      selectionModalBody.appendChild(btn);
+    });
+  }
+
+  function selectOption(value) {
+    if (currentSelectionType === 'district') {
+      selectedDistrict = value;
+      labelDistrict.textContent = value === 'all' ? 'All Districts' : value;
+      labelDistrict.title = value === 'all' ? 'All Districts' : value;
+      if (value !== 'all') labelDistrict.classList.add('text-teal-700');
+      else labelDistrict.classList.remove('text-teal-700');
+    } else if (currentSelectionType === 'school') {
+      selectedSchool = value;
+      labelSchool.textContent = value === 'all' ? 'All Schools' : value;
+      labelSchool.title = value === 'all' ? 'All Schools' : value;
+      if (value !== 'all') labelSchool.classList.add('text-teal-700');
+      else labelSchool.classList.remove('text-teal-700');
+    } else if (currentSelectionType === 'group') {
+      selectedGroup = value;
+      labelGroup.textContent = value === 'all' ? 'All Groups' : value;
+      labelGroup.title = value === 'all' ? 'All Groups' : value;
+      if (value !== 'all') labelGroup.classList.add('text-teal-700');
+      else labelGroup.classList.remove('text-teal-700');
+    }
+    
+    closeSelectionModal();
+    handleFilterChange();
+  }
+
+  function closeSelectionModal() {
+    selectionModal.classList.remove('opacity-100');
+    selectionModal.classList.add('opacity-0', 'pointer-events-none');
+    selectionModalInner.classList.add('scale-95', 'translate-y-8');
+    selectionModalInner.classList.remove('scale-100', 'translate-y-0');
+    
+    setTimeout(() => {
+      selectionModal.classList.add('hidden');
+    }, 300);
   }
 
   function openModal(student) {

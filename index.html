@@ -213,50 +213,23 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4 max-w-2xl mx-auto">
-          <!-- District Filter -->
-          <div class="relative w-full">
-            <select
-              id="district-filter"
-              class="w-full appearance-none rounded-xl border border-slate-200 bg-white/90 py-3 px-4 text-sm font-semibold shadow-sm backdrop-blur-md transition-all duration-300 focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10 focus:outline-none text-slate-700 cursor-pointer pr-10 truncate"
-            >
-              <option value="all">All Districts</option>
-            </select>
-            <div
-              class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg>
-            </div>
-          </div>
+          <!-- District Selector Button -->
+          <button id="btn-select-district" class="flex justify-between items-center w-full rounded-xl border border-slate-200 bg-white/90 py-3 px-4 text-sm font-semibold shadow-sm transition-all focus:outline-none focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 text-slate-700 hover:bg-slate-50">
+            <span class="truncate" id="label-district">All Districts</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400 shrink-0 ml-2"><path d="m6 9 6 6 6-6" /></svg>
+          </button>
 
-          <!-- School Filter -->
-          <div class="relative w-full">
-            <select
-              id="school-filter"
-              class="w-full appearance-none rounded-xl border border-slate-200 bg-white/90 py-3 px-4 text-sm font-semibold shadow-sm backdrop-blur-md transition-all duration-300 focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10 focus:outline-none text-slate-700 cursor-pointer pr-10 truncate"
-            >
-              <option value="all">All Schools</option>
-            </select>
-            <div
-              class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg>
-            </div>
-          </div>
+          <!-- School Selector Button -->
+          <button id="btn-select-school" class="flex justify-between items-center w-full rounded-xl border border-slate-200 bg-white/90 py-3 px-4 text-sm font-semibold shadow-sm transition-all focus:outline-none focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 text-slate-700 hover:bg-slate-50">
+            <span class="truncate" id="label-school">All Schools</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400 shrink-0 ml-2"><path d="m6 9 6 6 6-6" /></svg>
+          </button>
 
-          <!-- Group Filter -->
-          <div class="relative w-full">
-            <select
-              id="group-filter"
-              class="w-full appearance-none rounded-xl border border-slate-200 bg-white/90 py-3 px-4 text-sm font-semibold shadow-sm backdrop-blur-md transition-all duration-300 focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10 focus:outline-none text-slate-700 cursor-pointer pr-10 truncate"
-            >
-              <option value="all">All Groups</option>
-            </select>
-            <div
-              class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg>
-            </div>
-          </div>
+          <!-- Group Selector Button -->
+          <button id="btn-select-group" class="flex justify-between items-center w-full rounded-xl border border-slate-200 bg-white/90 py-3 px-4 text-sm font-semibold shadow-sm transition-all focus:outline-none focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 text-slate-700 hover:bg-slate-50">
+            <span class="truncate" id="label-group">All Groups</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400 shrink-0 ml-2"><path d="m6 9 6 6 6-6" /></svg>
+          </button>
         </div>
 
         <div class="group relative mx-auto max-w-2xl mb-4">
@@ -673,6 +646,73 @@
           <div id="modal-schools-body" class="space-y-2 hidden">
             <!-- School list injected here -->
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Selection Modal -->
+    <div
+      id="selection-modal"
+      class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 opacity-0 pointer-events-none transition-all duration-300 hidden p-4"
+    >
+      <div
+        class="bg-white rounded-3xl w-full max-w-md shadow-2xl transform translate-y-8 transition-all duration-300 overflow-hidden scale-95 flex flex-col max-h-[90vh]"
+        id="selection-modal-inner"
+      >
+        <div class="relative p-6 border-b border-slate-100 bg-slate-50/50 shrink-0">
+          <button
+            class="absolute top-5 right-5 h-8 w-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors z-10"
+            id="selection-modal-close"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+          <h3
+            id="selection-modal-title"
+            class="text-xl font-black text-slate-900 leading-tight"
+          >
+            Select Option
+          </h3>
+          <!-- Modal search bar -->
+          <div class="mt-4 relative" id="selection-modal-search-container">
+            <input
+              type="text"
+              id="selection-modal-search"
+              placeholder="Search..."
+              autocomplete="off"
+              class="w-full appearance-none rounded-xl border border-slate-200 bg-white py-2.5 pr-4 pl-10 text-sm font-semibold shadow-sm focus:border-teal-500 focus:outline-none"
+            />
+            <svg
+              class="pointer-events-none absolute top-[13px] left-3.5 h-4 w-4 text-slate-400"
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </div>
+        </div>
+        <div class="overflow-y-auto bg-white flex-1 p-6 space-y-2" id="selection-modal-body">
+          <!-- Selection items injected here -->
         </div>
       </div>
     </div>
