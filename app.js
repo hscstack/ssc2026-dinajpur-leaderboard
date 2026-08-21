@@ -78,6 +78,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const results = await Promise.all(requests);
       rawData = results.flat();
       
+      const entityDiv = document.createElement('div');
+      rawData.forEach(s => {
+        if (s.school) {
+          entityDiv.innerHTML = s.school;
+          s.school = entityDiv.textContent;
+        }
+        if (s.name) {
+          entityDiv.innerHTML = s.name;
+          s.name = entityDiv.textContent;
+        }
+      });
+
       if (rawData.length === 0) {
         showState('empty');
         return;
