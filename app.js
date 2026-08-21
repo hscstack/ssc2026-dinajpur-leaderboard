@@ -402,7 +402,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       const safeSchool = student.school ? student.school.toUpperCase() : 'N/A';
-      const isRZS = safeSchool === 'RANGPUR ZILA SCHOOL';
+      const isRZS = safeSchool === 'RANGPUR ZILLA SCHOOL';
       const safeGpa = typeof student.gpa === 'number' ? student.gpa.toFixed(2) : student.gpa;
       
       // Mobile-friendly card format for small screens, table row for large screens
@@ -675,7 +675,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     modalName.textContent = student.name;
     const schoolName = student.school ? student.school.toUpperCase() : 'N/A';
-    const isRZS = schoolName === 'RANGPUR ZILA SCHOOL';
+    const isRZS = schoolName === 'RANGPUR ZILLA SCHOOL';
 
     
     modalSchool.textContent = schoolName;
