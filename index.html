@@ -76,7 +76,16 @@
             <polyline points="16 18 22 12 16 6" />
             <polyline points="8 6 2 12 8 18" />
           </svg>
-          <span>Built By <a href="https://facebook.com/trtajim" target="_blank" rel="noopener noreferrer" class="font-bold text-slate-800 hover:text-indigo-600 transition-colors">TR Tajim</a></span>
+          <span
+            >Built By
+            <a
+              href="https://facebook.com/trtajim"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="font-bold text-slate-800 hover:text-indigo-600 transition-colors"
+              >TR Tajim</a
+            ></span
+          >
         </div>
         <h1
           class="mb-4 text-4xl font-black tracking-tight text-slate-900 sm:text-6xl lg:leading-[1.15]"
@@ -919,6 +928,75 @@
             Cancel
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- Welcome Modal -->
+    <div
+      id="welcome-modal"
+      class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 opacity-0 pointer-events-none transition-all duration-300 hidden p-4"
+    >
+      <div
+        class="bg-white rounded-3xl w-full max-w-md shadow-2xl transform translate-y-8 transition-all duration-300 overflow-hidden scale-95 flex flex-col p-6"
+        id="welcome-modal-inner"
+      >
+        <div class="flex items-center gap-3 mb-4">
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-full bg-teal-100 text-teal-600 shrink-0"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+              ></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </div>
+          <h3 class="text-xl font-black text-slate-900 leading-tight">
+            স্বাগতম!
+          </h3>
+        </div>
+        <div
+          class="text-slate-600 mb-6 font-medium space-y-4 text-sm sm:text-base leading-relaxed"
+        >
+          <p>
+            ওয়েবসাইটে
+            <strong>অতিরিক্ত ১০০ ও Optional বিষয়ের ৪০ নম্বর বাদ দিয়ে</strong>
+            হিসাব করা হয়েছে। তাই প্রদর্শিত নম্বরের সঙ্গে
+            <strong>১৪০ যোগ করলে ১২৫০-এর মধ্যে মোট নম্বর</strong> পাবেন।
+          </p>
+          <p>
+            বর্তমানে প্রায় <strong>৬০টি স্কুল</strong> যুক্ত করা হয়েছে। আপনার
+            স্কুল না থাকলে <strong>"New School Request"</strong> অপশনে ক্লিক করে
+            অনুরোধ করতে পারেন।
+          </p>
+          <p class="font-bold text-slate-800">
+            Regards,<br />
+            <a
+              href="https://facebook.com/trtajim"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-indigo-600 hover:text-indigo-700 hover:underline transition-colors"
+              >Tajim</a
+            >
+          </p>
+        </div>
+        <button
+          id="welcome-close"
+          class="w-full py-3.5 bg-teal-600 text-white font-bold rounded-xl shadow-md shadow-teal-500/20 hover:bg-teal-700 active:scale-[0.98] transition-all"
+        >
+          বুঝতে পেরেছি
+        </button>
       </div>
     </div>
 

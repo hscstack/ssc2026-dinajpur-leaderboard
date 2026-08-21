@@ -69,6 +69,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const newSchoolModalInner = document.getElementById('new-school-modal-inner');
   const newSchoolClose = document.getElementById('new-school-close');
 
+  const welcomeModal = document.getElementById('welcome-modal');
+  const welcomeModalInner = document.getElementById('welcome-modal-inner');
+  const welcomeClose = document.getElementById('welcome-close');
+
   // State
   let rawData = [];
   let filteredData = [];
@@ -148,6 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if (!takedownModal.classList.contains('hidden')) closeTakedownModal();
           if (!newSchoolModal.classList.contains('hidden')) closeNewSchoolModal();
           if (!selectionModal.classList.contains('hidden')) closeSelectionModal();
+          if (welcomeModal && !welcomeModal.classList.contains('hidden')) closeWelcomeModal();
         }
       });
 
@@ -181,6 +186,14 @@ document.addEventListener('DOMContentLoaded', () => {
         newSchoolModal.addEventListener('click', (e) => {
           if (e.target === newSchoolModal) closeNewSchoolModal();
         });
+      }
+
+      // Welcome Modal
+      if (!sessionStorage.getItem('welcome_seen')) {
+        openWelcomeModal();
+      }
+      if (welcomeClose) {
+        welcomeClose.addEventListener('click', closeWelcomeModal);
       }
       
     } catch (error) {
@@ -786,6 +799,28 @@ document.addEventListener('DOMContentLoaded', () => {
     
     setTimeout(() => {
       newSchoolModal.classList.add('hidden');
+    }, 300);
+  }
+
+  function openWelcomeModal() {
+    welcomeModal.classList.remove('hidden');
+    setTimeout(() => {
+      welcomeModal.classList.add('opacity-100');
+      welcomeModal.classList.remove('opacity-0', 'pointer-events-none');
+      welcomeModalInner.classList.remove('scale-95', 'translate-y-8');
+      welcomeModalInner.classList.add('scale-100', 'translate-y-0');
+    }, 10);
+  }
+
+  function closeWelcomeModal() {
+    welcomeModal.classList.remove('opacity-100');
+    welcomeModal.classList.add('opacity-0', 'pointer-events-none');
+    welcomeModalInner.classList.add('scale-95', 'translate-y-8');
+    welcomeModalInner.classList.remove('scale-100', 'translate-y-0');
+    sessionStorage.setItem('welcome_seen', 'true');
+    
+    setTimeout(() => {
+      welcomeModal.classList.add('hidden');
     }, 300);
   }
 
