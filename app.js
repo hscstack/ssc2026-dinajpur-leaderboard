@@ -60,11 +60,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function init() {
     try {
-      const response = await fetch('data/results.json');
-      if (!response.ok) throw new Error('Failed to fetch data');
+      const manifestResponse = await fetch('data/manifest.json');
+      if (!manifestResponse.ok) throw new Error('Failed to fetch manifest');
+      const files = await manifestResponse.json();
       
-      const data = await response.json();
-      rawData = data.students || [];
+      const requests = files.map(file => fetch(`data/${file}`).then(res => {
+        if (!res.ok) throw new Error(`Failed to fetch data/${file}`);
+        return res.json();
+      }));
+      
+      const results = await Promise.all(requests);
+      rawData = results.flat();
       
       if (rawData.length === 0) {
         showState('empty');
