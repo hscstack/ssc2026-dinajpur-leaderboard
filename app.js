@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const statGpa5 = document.getElementById('stat-gpa5');
   const statDistricts = document.getElementById('stat-districts');
   const statSchoolsContainer = document.getElementById('stat-schools-container');
+  const statDistrictsContainer = document.getElementById('stat-districts-container');
 
   
   const paginationContainer = document.getElementById('pagination-container');
@@ -94,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btnPrev.addEventListener('click', () => changePage(-1));
       btnNext.addEventListener('click', () => changePage(1));
       statSchoolsContainer.addEventListener('click', showSchoolsModal);
+      statDistrictsContainer.addEventListener('click', showDistrictsModal);
 
       
       // Modal Close
@@ -473,11 +475,44 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     const sortedSchools = Array.from(uniqueSchools).sort();
 
+    modalSchoolsHeader.querySelector('h3').textContent = 'Participating Schools';
+    modalSchoolsHeader.querySelector('span').textContent = 'List of Schools';
     modalSchoolsBody.innerHTML = '';
     sortedSchools.forEach(school => {
       const el = document.createElement('div');
       el.className = 'py-2 px-3 bg-slate-50 border border-slate-100 rounded-lg text-slate-800 font-semibold text-sm';
       el.textContent = school;
+      modalSchoolsBody.appendChild(el);
+    });
+
+    modalStudentHeader.classList.add('hidden');
+    modalStudentBody.classList.add('hidden');
+    modalSchoolsHeader.classList.remove('hidden');
+    modalSchoolsBody.classList.remove('hidden');
+
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+      modal.classList.add('opacity-100');
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      modalContentInner.classList.remove('scale-95', 'translate-y-8');
+      modalContentInner.classList.add('scale-100', 'translate-y-0');
+    }, 10);
+  }
+
+  function showDistrictsModal() {
+    const uniqueDistricts = new Set();
+    filteredData.forEach(s => {
+      if (s.district) uniqueDistricts.add(s.district.toUpperCase());
+    });
+    const sortedDistricts = Array.from(uniqueDistricts).sort();
+
+    modalSchoolsHeader.querySelector('h3').textContent = 'Participating Districts';
+    modalSchoolsHeader.querySelector('span').textContent = 'List of Districts';
+    modalSchoolsBody.innerHTML = '';
+    sortedDistricts.forEach(district => {
+      const el = document.createElement('div');
+      el.className = 'py-2 px-3 bg-slate-50 border border-slate-100 rounded-lg text-slate-800 font-semibold text-sm';
+      el.textContent = district;
       modalSchoolsBody.appendChild(el);
     });
 
