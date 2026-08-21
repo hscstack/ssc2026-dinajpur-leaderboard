@@ -1,7 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
   // DOM Elements
   const searchInput = document.getElementById('search-input');
+  const districtFilter = document.getElementById('district-filter');
   const schoolFilter = document.getElementById('school-filter');
+  const groupFilter = document.getElementById('group-filter');
   const leaderboardBody = document.getElementById('leaderboard-body');
   const leaderboardContainer = document.getElementById('leaderboard-container');
   
@@ -32,6 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalRoll = document.getElementById('modal-roll');
   const modalGpa = document.getElementById('modal-gpa');
   const modalMarks = document.getElementById('modal-marks');
+  const modalGradesSection = document.getElementById('modal-grades-section');
+  const modalGrades = document.getElementById('modal-grades');
   const modalStudentHeader = document.getElementById('modal-student-header');
   const modalSchoolsHeader = document.getElementById('modal-schools-header');
   const modalStudentBody = document.getElementById('modal-student-body');
@@ -82,7 +86,9 @@ document.addEventListener('DOMContentLoaded', () => {
       
       // Event Listeners
       searchInput.addEventListener('input', handleFilterChange);
+      districtFilter.addEventListener('change', handleFilterChange);
       schoolFilter.addEventListener('change', handleFilterChange);
+      groupFilter.addEventListener('change', handleFilterChange);
       pageSizeSelect.addEventListener('change', handlePageSizeChange);
       btnPrev.addEventListener('click', () => changePage(-1));
       btnNext.addEventListener('click', () => changePage(1));
@@ -147,8 +153,10 @@ document.addEventListener('DOMContentLoaded', () => {
       return b.mark - a.mark;
     });
 
-    // 2. Assign global rank and extract unique schools
+    // 2. Assign global rank and extract unique schools, districts, groups
     const uniqueSchools = new Set();
+    const uniqueDistricts = new Set();
+    const uniqueGroups = new Set();
     let currentGlobalRank = 1;
     for (let i = 0; i < rawData.length; i++) {
       const student = rawData[i];
@@ -160,9 +168,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       student.globalRank = currentGlobalRank;
       
-      if (student.school) {
-        uniqueSchools.add(student.school.toUpperCase());
-      }
+      if (student.school) uniqueSchools.add(student.school.toUpperCase());
+      if (student.district) uniqueDistricts.add(student.district.toUpperCase());
+      if (student.group) uniqueGroups.add(student.group.toUpperCase());
     }
 
     // 3. Assign school-specific rank
@@ -195,13 +203,29 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // 4. Populate school filter dropdown
+    // 4. Populate filter dropdowns
+    const sortedDistricts = Array.from(uniqueDistricts).sort();
+    sortedDistricts.forEach(district => {
+      const option = document.createElement('option');
+      option.value = district;
+      option.textContent = district;
+      districtFilter.appendChild(option);
+    });
+
     const sortedSchools = Array.from(uniqueSchools).sort();
     sortedSchools.forEach(school => {
       const option = document.createElement('option');
       option.value = school;
       option.textContent = school;
       schoolFilter.appendChild(option);
+    });
+
+    const sortedGroups = Array.from(uniqueGroups).sort();
+    sortedGroups.forEach(group => {
+      const option = document.createElement('option');
+      option.value = group;
+      option.textContent = group;
+      groupFilter.appendChild(option);
     });
   }
 
@@ -219,12 +243,18 @@ document.addEventListener('DOMContentLoaded', () => {
   function applyFilters() {
     const searchTerm = searchInput.value.toLowerCase().trim();
     const selectedSchool = schoolFilter.value;
+    const selectedDistrict = districtFilter.value;
+    const selectedGroup = groupFilter.value;
 
     filteredData = rawData.filter(student => {
       const matchName = !searchTerm || (student.name && student.name.toLowerCase().includes(searchTerm));
       const matchSchool = selectedSchool === 'all' || 
                          (student.school && student.school.toUpperCase() === selectedSchool);
-      return matchName && matchSchool;
+      const matchDistrict = selectedDistrict === 'all' ||
+                           (student.district && student.district.toUpperCase() === selectedDistrict);
+      const matchGroup = selectedGroup === 'all' ||
+                        (student.group && student.group.toUpperCase() === selectedGroup);
+      return matchName && matchSchool && matchDistrict && matchGroup;
     });
 
     if (selectedSchool !== 'all') {
@@ -232,11 +262,9 @@ document.addEventListener('DOMContentLoaded', () => {
       filteredData.forEach(student => {
         student.displayRank = student.schoolRank;
       });
-      // Sort by school rank ONLY if not searching, or keep it sorted so search results are ordered by rank
       filteredData.sort((a, b) => a.schoolRank - b.schoolRank);
       
       if (pageTitleText) {
-        // truncate if very long
         const displayName = selectedSchool.length > 25 ? selectedSchool.substring(0, 25) + '...' : selectedSchool;
         pageTitleText.textContent = `${displayName} Leaderboard`;
       }
@@ -245,10 +273,18 @@ document.addEventListener('DOMContentLoaded', () => {
       filteredData.forEach(student => {
         student.displayRank = student.globalRank;
       });
-      // Sort by global rank
       filteredData.sort((a, b) => a.globalRank - b.globalRank);
       
-      if (pageTitleText) pageTitleText.textContent = `Dinajpur Board Leaderboard`;
+      if (pageTitleText) {
+        let titleParts = [];
+        if (selectedDistrict !== 'all') titleParts.push(selectedDistrict);
+        if (selectedGroup !== 'all') titleParts.push(selectedGroup);
+        if (titleParts.length > 0) {
+          pageTitleText.textContent = `${titleParts.join(' - ')} Leaderboard`;
+        } else {
+          pageTitleText.textContent = `Dinajpur Board Leaderboard`;
+        }
+      }
     }
 
     updateStats();
@@ -321,7 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       
       const safeSchool = student.school ? student.school.toUpperCase() : 'N/A';
-      const isRZS = safeSchool === 'RANGPUR ZILLA SCHOOL';
+      const isRZS = safeSchool === 'RANGPUR ZILA SCHOOL, RANGPUR';
       const safeGpa = typeof student.gpa === 'number' ? student.gpa.toFixed(2) : student.gpa;
       
       // Mobile-friendly card format for small screens, table row for large screens
@@ -463,7 +499,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     modalName.textContent = student.name;
     const schoolName = student.school ? student.school.toUpperCase() : 'N/A';
-    const isRZS = schoolName === 'RANGPUR ZILLA SCHOOL';
+    const isRZS = schoolName === 'RANGPUR ZILA SCHOOL, RANGPUR';
 
     
     modalSchool.textContent = schoolName;
@@ -492,6 +528,28 @@ document.addEventListener('DOMContentLoaded', () => {
       modalRollRow.classList.remove('flex');
     }
     
+    if (student.grades && Object.keys(student.grades).length > 0) {
+      modalGrades.innerHTML = '';
+      for (const [subject, grade] of Object.entries(student.grades)) {
+        let gradeColor = 'text-slate-700 bg-slate-100';
+        if (grade === 'A+') gradeColor = 'text-emerald-700 bg-emerald-100';
+        else if (grade === 'A') gradeColor = 'text-teal-700 bg-teal-100';
+        else if (grade === 'A-') gradeColor = 'text-cyan-700 bg-cyan-100';
+        else if (grade === 'F') gradeColor = 'text-red-700 bg-red-100';
+        
+        const row = document.createElement('div');
+        row.className = 'flex justify-between items-center py-1.5 px-3 bg-slate-50 rounded-lg border border-slate-100';
+        row.innerHTML = `
+          <span class="text-xs font-semibold text-slate-600 truncate mr-2" title="${escapeHTML(subject)}">${escapeHTML(subject)}</span>
+          <span class="inline-flex items-center justify-center px-2 py-0.5 rounded text-xs font-bold shrink-0 ${gradeColor}">${grade}</span>
+        `;
+        modalGrades.appendChild(row);
+      }
+      modalGradesSection.classList.remove('hidden');
+    } else {
+      modalGradesSection.classList.add('hidden');
+    }
+
     modal.classList.remove('hidden');
     // small delay to allow display:block to apply before animating opacity/transform
     setTimeout(() => {

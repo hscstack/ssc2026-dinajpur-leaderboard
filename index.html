@@ -172,33 +172,54 @@
           </div>
         </div>
 
-        <div class="mx-auto max-w-lg relative mb-4">
-          <select
-            id="school-filter"
-            class="w-full appearance-none rounded-2xl border border-slate-200 bg-white/90 py-4 px-4 text-sm font-semibold shadow-sm backdrop-blur-md transition-all duration-300 focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10 focus:outline-none text-slate-700 cursor-pointer pr-12 truncate"
-          >
-            <option value="all">All Schools</option>
-          </select>
-          <div
-            class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4 max-w-2xl mx-auto">
+          <!-- District Filter -->
+          <div class="relative w-full">
+            <select
+              id="district-filter"
+              class="w-full appearance-none rounded-xl border border-slate-200 bg-white/90 py-3 px-4 text-sm font-semibold shadow-sm backdrop-blur-md transition-all duration-300 focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10 focus:outline-none text-slate-700 cursor-pointer pr-10 truncate"
             >
-              <path d="m6 9 6 6 6-6" />
-            </svg>
+              <option value="all">All Districts</option>
+            </select>
+            <div
+              class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+            </div>
+          </div>
+
+          <!-- School Filter -->
+          <div class="relative w-full">
+            <select
+              id="school-filter"
+              class="w-full appearance-none rounded-xl border border-slate-200 bg-white/90 py-3 px-4 text-sm font-semibold shadow-sm backdrop-blur-md transition-all duration-300 focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10 focus:outline-none text-slate-700 cursor-pointer pr-10 truncate"
+            >
+              <option value="all">All Schools</option>
+            </select>
+            <div
+              class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+            </div>
+          </div>
+
+          <!-- Group Filter -->
+          <div class="relative w-full">
+            <select
+              id="group-filter"
+              class="w-full appearance-none rounded-xl border border-slate-200 bg-white/90 py-3 px-4 text-sm font-semibold shadow-sm backdrop-blur-md transition-all duration-300 focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10 focus:outline-none text-slate-700 cursor-pointer pr-10 truncate"
+            >
+              <option value="all">All Groups</option>
+            </select>
+            <div
+              class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6" /></svg>
+            </div>
           </div>
         </div>
 
-        <div class="group relative mx-auto max-w-lg mb-4">
+        <div class="group relative mx-auto max-w-2xl mb-4">
           <div
             class="absolute -inset-0.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 opacity-0 blur-md transition duration-300 group-focus-within:opacity-10"
           ></div>
@@ -577,7 +598,7 @@
                 >5.00</span
               >
             </div>
-            <div class="flex justify-between items-center">
+            <div class="flex justify-between items-center pb-4 border-b border-slate-100">
               <div class="flex items-center gap-2 text-slate-500">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -600,6 +621,10 @@
               <span class="font-black text-slate-900 text-xl" id="modal-marks"
                 >1200</span
               >
+            </div>
+            <div id="modal-grades-section" class="hidden">
+              <h4 class="font-bold text-slate-700 text-sm uppercase tracking-wider mb-3">Subject Grades</h4>
+              <div id="modal-grades" class="grid grid-cols-1 gap-1.5"></div>
             </div>
           </div>
 
