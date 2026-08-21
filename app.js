@@ -266,32 +266,31 @@ document.addEventListener('DOMContentLoaded', () => {
   function applyFilters() {
     const searchTerm = searchInput.value.toLowerCase().trim();
 
-    filteredData = rawData.filter(student => {
-      const matchName = !searchTerm || (student.name && student.name.toLowerCase().includes(searchTerm));
+    let contextData = rawData.filter(student => {
       const matchSchool = selectedSchool === 'all' || 
                          (student.school && student.school.toUpperCase() === selectedSchool);
       const matchDistrict = selectedDistrict === 'all' ||
                            (student.district && student.district.toUpperCase() === selectedDistrict);
       const matchGroup = selectedGroup === 'all' ||
                         (student.group && student.group.toUpperCase() === selectedGroup);
-      return matchName && matchSchool && matchDistrict && matchGroup;
+      return matchSchool && matchDistrict && matchGroup;
     });
 
-    const hasFilter = selectedSchool !== 'all' || selectedDistrict !== 'all' || selectedGroup !== 'all' || searchTerm !== '';
+    const hasContextFilter = selectedSchool !== 'all' || selectedDistrict !== 'all' || selectedGroup !== 'all';
 
-    if (hasFilter) {
+    if (hasContextFilter) {
       // Sort by GPA (desc) then Mark (desc) to ensure correct ranking order
-      filteredData.sort((a, b) => {
+      contextData.sort((a, b) => {
         if (b.gpa !== a.gpa) return b.gpa - a.gpa;
         return b.mark - a.mark;
       });
 
-      // Assign dynamic rank starting from 1
+      // Assign dynamic rank starting from 1 for context
       let currentRank = 1;
-      for (let i = 0; i < filteredData.length; i++) {
-        const student = filteredData[i];
+      for (let i = 0; i < contextData.length; i++) {
+        const student = contextData[i];
         if (i > 0) {
-          const prev = filteredData[i - 1];
+          const prev = contextData[i - 1];
           if (student.gpa !== prev.gpa || student.mark !== prev.mark) {
             currentRank = i + 1;
           }
@@ -300,11 +299,16 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     } else {
       // Use pre-calculated global rank
-      filteredData.forEach(student => {
+      contextData.forEach(student => {
         student.displayRank = student.globalRank;
       });
-      filteredData.sort((a, b) => a.globalRank - b.globalRank);
+      contextData.sort((a, b) => a.globalRank - b.globalRank);
     }
+
+    // Apply text search on top of context data
+    filteredData = contextData.filter(student => {
+      return !searchTerm || (student.name && student.name.toLowerCase().includes(searchTerm));
+    });
 
     if (pageTitleText) {
       let titleParts = [];
