@@ -277,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return matchName && matchSchool && matchDistrict && matchGroup;
     });
 
-    const hasFilter = selectedSchool !== 'all' || selectedDistrict !== 'all' || selectedGroup !== 'all';
+    const hasFilter = selectedSchool !== 'all' || selectedDistrict !== 'all' || selectedGroup !== 'all' || searchTerm !== '';
 
     if (hasFilter) {
       // Sort by GPA (desc) then Mark (desc) to ensure correct ranking order
