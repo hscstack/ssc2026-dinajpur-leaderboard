@@ -277,16 +277,26 @@ document.addEventListener('DOMContentLoaded', () => {
       return matchName && matchSchool && matchDistrict && matchGroup;
     });
 
-    if (selectedSchool !== 'all') {
-      // Use pre-calculated school rank
-      filteredData.forEach(student => {
-        student.displayRank = student.schoolRank;
+    const hasFilter = selectedSchool !== 'all' || selectedDistrict !== 'all' || selectedGroup !== 'all';
+
+    if (hasFilter) {
+      // Sort by GPA (desc) then Mark (desc) to ensure correct ranking order
+      filteredData.sort((a, b) => {
+        if (b.gpa !== a.gpa) return b.gpa - a.gpa;
+        return b.mark - a.mark;
       });
-      filteredData.sort((a, b) => a.schoolRank - b.schoolRank);
-      
-      if (pageTitleText) {
-        const displayName = selectedSchool.length > 25 ? selectedSchool.substring(0, 25) + '...' : selectedSchool;
-        pageTitleText.textContent = `${displayName} Leaderboard`;
+
+      // Assign dynamic rank starting from 1
+      let currentRank = 1;
+      for (let i = 0; i < filteredData.length; i++) {
+        const student = filteredData[i];
+        if (i > 0) {
+          const prev = filteredData[i - 1];
+          if (student.gpa !== prev.gpa || student.mark !== prev.mark) {
+            currentRank = i + 1;
+          }
+        }
+        student.displayRank = currentRank;
       }
     } else {
       // Use pre-calculated global rank
@@ -294,16 +304,24 @@ document.addEventListener('DOMContentLoaded', () => {
         student.displayRank = student.globalRank;
       });
       filteredData.sort((a, b) => a.globalRank - b.globalRank);
+    }
+
+    if (pageTitleText) {
+      let titleParts = [];
+      if (selectedSchool !== 'all') {
+        const displayName = selectedSchool.length > 25 ? selectedSchool.substring(0, 25) + '...' : selectedSchool;
+        titleParts.push(displayName);
+      } else if (selectedDistrict !== 'all') {
+        titleParts.push(selectedDistrict);
+      }
+      if (selectedGroup !== 'all') {
+        titleParts.push(selectedGroup);
+      }
       
-      if (pageTitleText) {
-        let titleParts = [];
-        if (selectedDistrict !== 'all') titleParts.push(selectedDistrict);
-        if (selectedGroup !== 'all') titleParts.push(selectedGroup);
-        if (titleParts.length > 0) {
-          pageTitleText.textContent = `${titleParts.join(' - ')} Leaderboard`;
-        } else {
-          pageTitleText.textContent = `Dinajpur Board Leaderboard`;
-        }
+      if (titleParts.length > 0) {
+        pageTitleText.textContent = `${titleParts.join(' - ')} Leaderboard`;
+      } else {
+        pageTitleText.textContent = `Dinajpur Board Leaderboard`;
       }
     }
 
