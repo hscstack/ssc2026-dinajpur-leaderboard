@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const statStudents = document.getElementById('stat-students');
   const statSchools = document.getElementById('stat-schools');
   const statGpa5 = document.getElementById('stat-gpa5');
+  const statPassed = document.getElementById('stat-passed');
   const statSchoolsContainer = document.getElementById('stat-schools-container');
 
   
@@ -301,14 +302,17 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const currentSchools = new Set();
     let gpa5Count = 0;
+    let passedCount = 0;
     
     filteredData.forEach(s => {
       if (s.school) currentSchools.add(s.school.toUpperCase());
       if (parseFloat(s.gpa) === 5.0) gpa5Count++;
+      if (s.status && s.status.toUpperCase() === 'PASSED') passedCount++;
     });
     
     animateValue(statSchools, 0, currentSchools.size, 1000);
     animateValue(statGpa5, 0, gpa5Count, 1000);
+    animateValue(statPassed, 0, passedCount, 1000);
   }
 
   // Animation for stat numbers
