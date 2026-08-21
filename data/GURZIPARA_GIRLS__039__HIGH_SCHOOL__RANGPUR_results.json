@@ -1,0 +1,27 @@
+[
+  {
+    "name": "MOST. RUNA KHATUN",
+    "gpa": 2.78,
+    "mark": 552,
+    "status": "PASSED",
+    "group": "HUMANITIES",
+    "grades": {
+      "BANGLA I": "B",
+      "BANGLA II": "B",
+      "ENGLISH I": "D",
+      "ENGLISH II": "D",
+      "MATHEMATICS": "D",
+      "ISLAM AND MORAL EDUCATION": "A",
+      "INFORMATION AND COMMUNICATION TECHNOLOGY": "A",
+      "CIVICS AND CITIZENSHIP": "B",
+      "HISTORY OF BANGLADESH AND WORLD CIVILIZATION": "C",
+      "SCIENCE": "A-",
+      "GEOGRAPHY AND ENVIRONMENT": "C",
+      "AGRICULTURE STUDIES 4TH": "A-",
+      "PHYSICAL EDUCATION, HEALTH & SPORTS CA": "A+",
+      "CAREER EDUCATION CA": "A+"
+    },
+    "school": "GURZIPARA GIRLS&#039; HIGH SCHOOL, RANGPUR",
+    "district": "RANGPUR"
+  }
+]
