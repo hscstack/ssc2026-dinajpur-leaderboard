@@ -595,7 +595,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add "All" option
     const allBtn = document.createElement('button');
     allBtn.className = 'w-full text-left py-3 px-4 bg-slate-50 border border-slate-100 rounded-xl text-slate-800 font-bold text-sm hover:bg-teal-50 hover:text-teal-700 hover:border-teal-200 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500/20';
-    allBtn.textContent = \`All \${currentSelectionType.charAt(0).toUpperCase() + currentSelectionType.slice(1)}s\`;
+    allBtn.textContent = `All ${currentSelectionType.charAt(0).toUpperCase() + currentSelectionType.slice(1)}s`;
     allBtn.onclick = () => selectOption('all');
     selectionModalBody.appendChild(allBtn);
     
