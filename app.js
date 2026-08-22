@@ -92,6 +92,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function init() {
     try {
+      // Welcome Modal
+      if (!sessionStorage.getItem('welcome_seen')) {
+        openWelcomeModal();
+      }
+      if (welcomeClose) {
+        welcomeClose.addEventListener('click', closeWelcomeModal);
+      }
+      
       const manifestResponse = await fetch('data/manifest.json');
       if (!manifestResponse.ok) throw new Error('Failed to fetch manifest');
       const files = await manifestResponse.json();
@@ -120,9 +128,6 @@ document.addEventListener('DOMContentLoaded', () => {
         showState('empty');
         return;
       }
-      
-      setupData();
-      applyFilters();
       
       // Event Listeners
       searchInput.addEventListener('input', handleFilterChange);
@@ -187,14 +192,9 @@ document.addEventListener('DOMContentLoaded', () => {
           if (e.target === newSchoolModal) closeNewSchoolModal();
         });
       }
-
-      // Welcome Modal
-      if (!sessionStorage.getItem('welcome_seen')) {
-        openWelcomeModal();
-      }
-      if (welcomeClose) {
-        welcomeClose.addEventListener('click', closeWelcomeModal);
-      }
+      
+      setupData();
+      applyFilters();
       
     } catch (error) {
       console.error('Error loading data:', error);
