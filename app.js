@@ -638,7 +638,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     list.forEach(item => {
       const btn = document.createElement('button');
-      btn.className = 'w-full text-left py-3 px-4 bg-white border border-slate-100 rounded-xl text-slate-700 font-semibold text-sm hover:bg-slate-50 hover:border-slate-300 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/20 truncate';
+      btn.className = 'w-full text-left py-3 px-4 bg-white border border-slate-100 rounded-xl text-slate-700 font-semibold text-sm hover:bg-slate-50 hover:border-slate-300 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/20';
       btn.textContent = item;
       btn.title = item;
       btn.onclick = () => selectOption(item);
