@@ -1,0 +1,102 @@
+[
+  {
+    "name": "KAJOL CHANDRA",
+    "gpa": 3.72,
+    "mark": 683,
+    "status": "PASSED",
+    "group": "SCIENCE",
+    "grades": {
+      "BANGLA I": "A-",
+      "BANGLA II": "A-",
+      "ENGLISH I": "C",
+      "ENGLISH II": "C",
+      "MATHEMATICS": "C",
+      "HINDU RELIGION AND MORAL EDUCATION": "A",
+      "BANGLADESH AND GLOBAL STUDIES": "A",
+      "INFORMATION AND COMMUNICATION TECHNOLOGY": "A",
+      "PHYSICS": "A-",
+      "CHEMISTRY": "A",
+      "BIOLOGY": "A+",
+      "AGRICULTURE STUDIES 4TH": "A-",
+      "PHYSICAL EDUCATION, HEALTH & SPORTS CA": "A+",
+      "CAREER EDUCATION CA": "A+"
+    },
+    "school": "BOSNOB DUSH HIGH SCHOOL, GAIBANDHA",
+    "district": "GAIBANDHA"
+  },
+  {
+    "name": "MD SEEAM MIA",
+    "gpa": 2.78,
+    "mark": 542,
+    "status": "PASSED",
+    "group": "SCIENCE",
+    "grades": {
+      "BANGLA I": "C",
+      "BANGLA II": "C",
+      "ENGLISH I": "D",
+      "ENGLISH II": "D",
+      "MATHEMATICS": "D",
+      "ISLAM AND MORAL EDUCATION": "B",
+      "BANGLADESH AND GLOBAL STUDIES": "A-",
+      "INFORMATION AND COMMUNICATION TECHNOLOGY": "A",
+      "PHYSICS": "B",
+      "CHEMISTRY": "A-",
+      "BIOLOGY": "A",
+      "HIGHER MATHEMATICS 4TH": "F",
+      "PHYSICAL EDUCATION, HEALTH & SPORTS CA": "A+",
+      "CAREER EDUCATION CA": "A+"
+    },
+    "school": "BOSNOB DUSH HIGH SCHOOL, GAIBANDHA",
+    "district": "GAIBANDHA"
+  },
+  {
+    "name": "MD. ANAMUL HAQUE",
+    "gpa": 3.33,
+    "mark": 610,
+    "status": "PASSED",
+    "group": "SCIENCE",
+    "grades": {
+      "BANGLA I": "B",
+      "BANGLA II": "B",
+      "ENGLISH I": "C",
+      "ENGLISH II": "C",
+      "MATHEMATICS": "C",
+      "ISLAM AND MORAL EDUCATION": "B",
+      "BANGLADESH AND GLOBAL STUDIES": "B",
+      "INFORMATION AND COMMUNICATION TECHNOLOGY": "A+",
+      "PHYSICS": "A-",
+      "CHEMISTRY": "B",
+      "BIOLOGY": "A",
+      "AGRICULTURE STUDIES 4TH": "A-",
+      "PHYSICAL EDUCATION, HEALTH & SPORTS CA": "A+",
+      "CAREER EDUCATION CA": "A+"
+    },
+    "school": "BOSNOB DUSH HIGH SCHOOL, GAIBANDHA",
+    "district": "GAIBANDHA"
+  },
+  {
+    "name": "MST BILASI AKTER",
+    "gpa": 3.11,
+    "mark": 596,
+    "status": "PASSED",
+    "group": "HUMANITIES",
+    "grades": {
+      "BANGLA I": "B",
+      "BANGLA II": "B",
+      "ENGLISH I": "C",
+      "ENGLISH II": "C",
+      "MATHEMATICS": "C",
+      "ISLAM AND MORAL EDUCATION": "A-",
+      "INFORMATION AND COMMUNICATION TECHNOLOGY": "A+",
+      "CIVICS AND CITIZENSHIP": "B",
+      "HISTORY OF BANGLADESH AND WORLD CIVILIZATION": "D",
+      "SCIENCE": "B",
+      "GEOGRAPHY AND ENVIRONMENT": "A-",
+      "AGRICULTURE STUDIES 4TH": "A",
+      "PHYSICAL EDUCATION, HEALTH & SPORTS CA": "A+",
+      "CAREER EDUCATION CA": "A+"
+    },
+    "school": "BOSNOB DUSH HIGH SCHOOL, GAIBANDHA",
+    "district": "GAIBANDHA"
+  }
+]
