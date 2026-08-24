@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const statSchoolsContainer = document.getElementById('stat-schools-container');
   const statDistrictsContainer = document.getElementById('stat-districts-container');
 
-  
   const paginationContainer = document.getElementById('pagination-container');
   const pageSizeSelect = document.getElementById('page-size');
   const btnPrev = document.getElementById('btn-prev');
@@ -86,34 +85,49 @@ document.addEventListener('DOMContentLoaded', () => {
   let districtsList = [];
   let schoolsList = [];
   let groupsList = [];
+  let filesList = [];
+
+  // Cache for loaded school detail JSONs
+  const schoolDetailsCache = new Map();
 
   // Initialization
   init();
 
   async function init() {
     try {
-      const manifestResponse = await fetch('data/manifest.json');
-      if (!manifestResponse.ok) throw new Error('Failed to fetch manifest');
-      const files = await manifestResponse.json();
+      showState('loading');
+      const response = await fetch('data/leaderboard.json');
+      if (!response.ok) throw new Error('Failed to fetch leaderboard index');
+      const indexData = await response.json();
       
-      const requests = files.map(file => fetch(`data/${file}`).then(res => {
-        if (!res.ok) throw new Error(`Failed to fetch data/${file}`);
-        return res.json();
-      }));
-      
-      const results = await Promise.all(requests);
-      rawData = results.flat();
-      
-      const entityDiv = document.createElement('div');
-      rawData.forEach(s => {
-        if (s.school) {
-          entityDiv.innerHTML = s.school;
-          s.school = entityDiv.textContent;
-        }
-        if (s.name) {
-          entityDiv.innerHTML = s.name;
-          s.name = entityDiv.textContent;
-        }
+      districtsList = indexData.districts || [];
+      schoolsList = indexData.schools || [];
+      groupsList = indexData.groups || [];
+      filesList = indexData.files || [];
+
+      // Unpack compact rows:
+      // [id, name, school_idx, dist_idx, grp_idx, gpa, mark, globalRank, passed_flag, roll, file_idx, file_inner_idx]
+      rawData = (indexData.students || []).map(row => {
+        const schoolName = row[2] >= 0 ? schoolsList[row[2]] : '';
+        const districtName = row[3] >= 0 ? districtsList[row[3]] : '';
+        const groupName = row[4] >= 0 ? groupsList[row[4]] : '';
+        const fileName = row[10] >= 0 ? filesList[row[10]] : '';
+
+        return {
+          id: row[0],
+          name: row[1],
+          school: schoolName,
+          district: districtName,
+          group: groupName,
+          gpa: row[5],
+          mark: row[6],
+          globalRank: row[7],
+          status: row[8] === 1 ? 'PASSED' : 'FAILED',
+          roll: row[9] || '',
+          file: fileName,
+          file_idx: row[11],
+          grades: null // loaded on demand when modal opens
+        };
       });
 
       if (rawData.length === 0) {
@@ -121,7 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       
-      setupData();
       applyFilters();
       
       // Event Listeners
@@ -140,7 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
       statSchoolsContainer.addEventListener('click', showSchoolsModal);
       statDistrictsContainer.addEventListener('click', showDistrictsModal);
 
-      
       // Modal Close
       modalClose.addEventListener('click', closeModal);
       modal.addEventListener('click', (e) => {
@@ -202,69 +214,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function setupData() {
-    // 1. Sort the entire dataset by GPA (desc) then Marks (desc)
-    rawData.sort((a, b) => {
-      if (b.gpa !== a.gpa) return b.gpa - a.gpa;
-      return b.mark - a.mark;
-    });
-
-    // 2. Assign global rank and extract unique schools, districts, groups
-    const uniqueSchools = new Set();
-    const uniqueDistricts = new Set();
-    const uniqueGroups = new Set();
-    let currentGlobalRank = 1;
-    for (let i = 0; i < rawData.length; i++) {
-      const student = rawData[i];
-      if (i > 0) {
-        const prev = rawData[i - 1];
-        if (student.gpa !== prev.gpa || student.mark !== prev.mark) {
-          currentGlobalRank = i + 1;
-        }
-      }
-      student.globalRank = currentGlobalRank;
-      
-      if (student.school) uniqueSchools.add(student.school.toUpperCase());
-      if (student.district) uniqueDistricts.add(student.district.toUpperCase());
-      if (student.group) uniqueGroups.add(student.group.toUpperCase());
-    }
-
-    // 3. Assign school-specific rank
-    uniqueSchools.forEach(school => {
-      // Get all students for this school
-      const schoolStudents = rawData.filter(s => s.school && s.school.toUpperCase() === school);
-      
-      // Sort them by GPA and Mark
-      schoolStudents.sort((a, b) => {
-        if (b.gpa !== a.gpa) return b.gpa - a.gpa;
-        return b.mark - a.mark;
-      });
-      
-      // Assign ranks based on the sorted array, but mutate the original objects in rawData
-      let currentSchoolRank = 1;
-      for (let i = 0; i < schoolStudents.length; i++) {
-        const student = schoolStudents[i];
-        if (i > 0) {
-          const prev = schoolStudents[i - 1];
-          if (student.gpa !== prev.gpa || student.mark !== prev.mark) {
-            currentSchoolRank = i + 1;
-          }
-        }
-        
-        // Find the actual object in rawData and mutate it so the rank persists
-        const originalStudent = rawData.find(s => s === student);
-        if (originalStudent) {
-          originalStudent.schoolRank = currentSchoolRank;
-        }
-      }
-    });
-
-    // 4. Save sorted lists for modal selection
-    districtsList = Array.from(uniqueDistricts).sort();
-    schoolsList = Array.from(uniqueSchools).sort();
-    groupsList = Array.from(uniqueGroups).sort();
-  }
-
   function handleFilterChange() {
     currentPage = 1;
     applyFilters();
@@ -292,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const hasContextFilter = selectedSchool !== 'all' || selectedDistrict !== 'all' || selectedGroup !== 'all';
 
     if (hasContextFilter) {
-      // Sort by GPA (desc) then Mark (desc) to ensure correct ranking order
+      // Sort by GPA (desc) then Mark (desc) to ensure correct ranking order in filtered view
       contextData.sort((a, b) => {
         if (b.gpa !== a.gpa) return b.gpa - a.gpa;
         return b.mark - a.mark;
@@ -311,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
         student.displayRank = currentRank;
       }
     } else {
-      // Use pre-calculated global rank
+      // Use pre-calculated global rank directly
       contextData.forEach(student => {
         student.displayRank = student.globalRank;
       });
@@ -400,7 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     leaderboardBody.innerHTML = '';
     
-    pageData.forEach((student, index) => {
+    pageData.forEach((student) => {
       const row = document.createElement('div');
       
       let rankColor = 'text-slate-600 bg-slate-100 group-hover:bg-white group-hover:shadow-sm border border-transparent';
@@ -490,7 +439,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     pageNumbersContainer.innerHTML = '';
     
-    // Simple logic for page numbers (show max 5)
     let startPage = Math.max(1, currentPage - 2);
     let endPage = Math.min(totalPages, startPage + 4);
     
@@ -609,7 +557,6 @@ document.addEventListener('DOMContentLoaded', () => {
     selectionModalSearch.value = '';
     renderSelectionList(list);
     
-    // Search functionality inside modal
     selectionModalSearch.oninput = (e) => {
       const q = e.target.value.toLowerCase();
       const filtered = list.filter(item => item.toLowerCase().includes(q));
@@ -629,7 +576,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderSelectionList(list) {
     selectionModalBody.innerHTML = '';
     
-    // Add "All" option
     const allBtn = document.createElement('button');
     allBtn.className = 'w-full text-left py-3 px-4 bg-slate-50 border border-slate-100 rounded-xl text-slate-800 font-bold text-sm hover:bg-teal-50 hover:text-teal-700 hover:border-teal-200 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500/20';
     allBtn.textContent = `All ${currentSelectionType.charAt(0).toUpperCase() + currentSelectionType.slice(1)}s`;
@@ -682,7 +628,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 300);
   }
 
-  function openModal(student) {
+  async function openModal(student) {
     modalStudentHeader.classList.remove('hidden');
     modalStudentBody.classList.remove('hidden');
     modalSchoolsHeader.classList.add('hidden');
@@ -691,7 +637,6 @@ document.addEventListener('DOMContentLoaded', () => {
     modalName.textContent = student.name;
     const schoolName = student.school ? student.school.toUpperCase() : 'N/A';
     const isRZS = schoolName === 'RANGPUR ZILLA SCHOOL';
-
     
     modalSchool.textContent = schoolName;
     if (isRZS) {
@@ -718,6 +663,36 @@ document.addEventListener('DOMContentLoaded', () => {
       modalRollRow.classList.add('hidden');
       modalRollRow.classList.remove('flex');
     }
+
+    // Lazy load grades if not already loaded
+    if (!student.grades && student.file) {
+      modalGradesSection.classList.remove('hidden');
+      modalGrades.innerHTML = `
+        <div class="col-span-full py-4 text-center text-xs font-medium text-slate-400">
+          Loading detailed subject grades...
+        </div>
+      `;
+      
+      try {
+        let schoolRecords;
+        if (schoolDetailsCache.has(student.file)) {
+          schoolRecords = schoolDetailsCache.get(student.file);
+        } else {
+          const res = await fetch(`data/${student.file}`);
+          if (res.ok) {
+            schoolRecords = await res.json();
+            schoolDetailsCache.set(student.file, schoolRecords);
+          }
+        }
+
+        if (schoolRecords && schoolRecords[student.file_idx]) {
+          const detail = schoolRecords[student.file_idx];
+          student.grades = detail.grades || {};
+        }
+      } catch (err) {
+        console.error('Failed to load student grade detail:', err);
+      }
+    }
     
     if (student.grades && Object.keys(student.grades).length > 0) {
       modalGrades.innerHTML = '';
@@ -742,7 +717,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     modal.classList.remove('hidden');
-    // small delay to allow display:block to apply before animating opacity/transform
     setTimeout(() => {
       modal.classList.add('opacity-100');
       modal.classList.remove('opacity-0', 'pointer-events-none');
