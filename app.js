@@ -278,11 +278,12 @@ document.addEventListener('DOMContentLoaded', () => {
         <button
           type="button"
           id="top-profile-login-btn"
-          class="inline-flex items-center gap-2 rounded-full border border-slate-200/90 bg-white/90 px-3.5 py-1.5 text-xs font-semibold text-slate-700 shadow-xs backdrop-blur-md transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 active:scale-95"
+          class="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white shadow-xs transition-all hover:bg-slate-800 hover:shadow-md active:scale-95"
         >
-          <svg class="h-3.5 w-3.5 text-slate-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
+          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+            <polyline points="10 17 15 12 10 7"/>
+            <line x1="15" y1="12" x2="3" y2="12"/>
           </svg>
           <span>Login</span>
         </button>
@@ -298,101 +299,58 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const name = currentUser.name || 'User';
     const email = currentUser.email || '';
-    const institution = currentUser.institution || '';
-    const rawAvatar = currentUser.avatar || '';
-    let avatarUrl = '';
-    if (rawAvatar) {
-      avatarUrl = rawAvatar.startsWith('http') ? rawAvatar : `https://hscstack.site${rawAvatar}`;
+    const rawImage = currentUser.image_url || currentUser.avatar || '';
+    let imageUrl = '';
+    if (rawImage) {
+      imageUrl = rawImage.startsWith('http') ? rawImage : `https://hscstack.site${rawImage}`;
     }
-    const initials = name
-      .split(' ')
-      .filter(Boolean)
-      .slice(0, 2)
-      .map(part => part[0].toUpperCase())
-      .join('');
+    const initial = name.trim().charAt(0).toUpperCase() || 'U';
 
-    const avatarHtml = avatarUrl
-      ? `<img src="${avatarUrl}" alt="${name}" class="h-7 w-7 rounded-full object-cover ring-1 ring-slate-200" onerror="this.outerHTML='<div class=\\'flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-teal-500 to-indigo-600 text-[11px] font-bold text-white shadow-xs\\'>${initials || 'U'}</div>'" />`
-      : `<div class="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-teal-500 to-indigo-600 text-[11px] font-bold text-white shadow-xs">${initials || 'U'}</div>`;
-
-    const dropdownAvatarHtml = avatarUrl
-      ? `<img src="${avatarUrl}" alt="${name}" class="h-11 w-11 rounded-full object-cover ring-2 ring-teal-50 shrink-0" onerror="this.outerHTML='<div class=\\'flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-tr from-teal-500 to-indigo-600 text-sm font-bold text-white shadow-xs\\'>${initials || 'U'}</div>'" />`
-      : `<div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-tr from-teal-500 to-indigo-600 text-sm font-bold text-white shadow-xs">${initials || 'U'}</div>`;
+    const avatarHtml = imageUrl
+      ? `<img src="${imageUrl}" alt="${name}" class="h-7 w-7 rounded-full object-cover ring-1 ring-slate-200" onerror="this.outerHTML='<span class=\\'flex h-7 w-7 items-center justify-center rounded-full bg-indigo-600 text-[11px] font-black text-white\\'>${initial}</span>'" />`
+      : `<span class="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-600 text-[11px] font-black text-white">${initial}</span>`;
 
     container.innerHTML = `
-      <div class="relative inline-block text-left" id="profile-widget-root">
+      <div class="relative" id="profile-widget-root">
         <button
           type="button"
           id="profile-card-toggle"
-          class="group flex items-center gap-2.5 rounded-full border border-slate-200/90 bg-white/95 py-1 pl-1.5 pr-3 shadow-xs backdrop-blur-md transition hover:border-slate-300 hover:shadow-md active:scale-95"
+          class="flex items-center gap-2.5 rounded-full border border-slate-200/90 bg-white py-1 pr-3 pl-1 shadow-2xs transition-all hover:border-slate-300 hover:bg-slate-50 active:scale-98"
         >
           ${avatarHtml}
-          <div class="text-left hidden sm:block">
-            <p class="text-xs font-semibold text-slate-800 line-clamp-1 max-w-[130px] leading-tight">${name}</p>
-            <p class="text-[10px] text-slate-400 font-medium leading-none">Manage Profile</p>
-          </div>
-          <svg class="h-3.5 w-3.5 text-slate-400 group-hover:text-slate-600 transition-transform duration-200" id="profile-card-chevron" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+          <span class="max-w-[130px] truncate text-xs font-bold text-slate-800 hidden sm:inline-block">
+            ${name}
+          </span>
+          <svg class="h-3.5 w-3.5 text-slate-400 transition-transform duration-200" id="profile-card-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
         </button>
 
         <div
           id="profile-dropdown-menu"
-          class="hidden absolute right-0 mt-2 w-72 origin-top-right rounded-2xl border border-slate-100 bg-white p-4 shadow-xl ring-1 ring-black/5 z-50 transition-all duration-150 text-left"
+          class="hidden absolute right-0 mt-2 w-56 origin-top-right rounded-2xl border border-slate-200 bg-white p-1.5 shadow-2xl text-left z-50 transition-all duration-150"
         >
-          <div class="flex items-center gap-3 border-b border-slate-100 pb-3 mb-3">
-            ${dropdownAvatarHtml}
-            <div class="min-w-0 flex-1">
-              <h4 class="text-sm font-bold text-slate-900 truncate">${name}</h4>
-              <p class="text-xs text-slate-500 truncate">${email}</p>
-              ${institution ? `<span class="mt-1 inline-block text-[10px] font-medium text-teal-700 bg-teal-50 rounded px-1.5 py-0.5 truncate max-w-full">${institution}</span>` : ''}
-            </div>
+          <!-- User Identity Card -->
+          <div class="border-b border-slate-100 p-2.5">
+            <p class="truncate text-xs font-bold text-slate-900">
+              ${name}
+            </p>
+            <p class="truncate text-[11px] font-medium text-slate-400">
+              ${email}
+            </p>
           </div>
 
-          <div class="space-y-1">
+          <div class="py-1">
             <a
               href="https://hscstack.site/profile"
               target="_blank"
-              class="flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors group"
+              class="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-900"
             >
-              <div class="flex items-center gap-2.5">
-                <div class="flex h-6 w-6 items-center justify-center rounded-lg bg-teal-50 text-teal-600">
-                  <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                  </svg>
-                </div>
-                <span>Manage Profile & Settings</span>
-              </div>
-              <svg class="h-3.5 w-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </a>
-
-            <a
-              href="https://hscstack.site"
-              target="_blank"
-              class="flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors"
-            >
-              <div class="flex items-center gap-2.5">
-                <div class="flex h-6 w-6 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
-                  <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                  </svg>
-                </div>
-                <span>HSCStack Main</span>
-              </div>
-              <span class="text-[10px] text-slate-400">Visit ↗</span>
-            </a>
-          </div>
-
-          <div class="mt-3 border-t border-slate-100 pt-2.5 flex items-center justify-between text-[11px]">
-            <span class="inline-flex items-center gap-1.5 text-emerald-600 font-medium">
-              <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Logged in
-            </span>
-            <a
-              href="https://hscstack.site/logout"
-              class="font-semibold text-rose-500 hover:text-rose-700 transition-colors"
-            >
-              Logout
+              <svg class="h-3.5 w-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span>Profile Settings</span>
             </a>
           </div>
         </div>
