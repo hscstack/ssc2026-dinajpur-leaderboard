@@ -239,15 +239,16 @@ document.addEventListener('DOMContentLoaded', () => {
   async function checkUserAuth() {
     if (isLoggedIn !== null) return isLoggedIn;
     try {
-      const res = await fetch('https://hscstack.site/profile', {
+      const res = await fetch('https://hscstack.site/api/auth/status', {
         method: 'GET',
-        credentials: 'include',
-        headers: {
-          'X-Inertia': 'true',
-          'X-Inertia-Version': ''
-        }
+        credentials: 'include'
       });
-      isLoggedIn = res.ok;
+      if (res.ok) {
+        const data = await res.json();
+        isLoggedIn = Boolean(data.authenticated);
+      } else {
+        isLoggedIn = false;
+      }
     } catch (e) {
       isLoggedIn = false;
     }
