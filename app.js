@@ -79,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // State
   let isLoggedIn = null;
+  let currentUser = null;
   let rawData = [];
   let filteredData = [];
   let currentPage = 1;
@@ -100,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
   init();
 
   async function init() {
+    checkUserAuth();
     try {
       showState('loading');
       const response = await fetch('data/leaderboard.json');
@@ -254,13 +256,174 @@ document.addEventListener('DOMContentLoaded', () => {
       if (res.ok) {
         const data = await res.json();
         isLoggedIn = Boolean(data.authenticated);
+        currentUser = data.user || null;
       } else {
         isLoggedIn = false;
+        currentUser = null;
       }
     } catch (e) {
       isLoggedIn = false;
+      currentUser = null;
     }
+    renderUserProfileWidget();
     return isLoggedIn;
+  }
+
+  function renderUserProfileWidget() {
+    const container = document.getElementById('user-profile-widget');
+    if (!container) return;
+
+    if (!isLoggedIn || !currentUser) {
+      container.innerHTML = `
+        <button
+          type="button"
+          id="top-profile-login-btn"
+          class="inline-flex items-center gap-2 rounded-full border border-slate-200/90 bg-white/90 px-3.5 py-1.5 text-xs font-semibold text-slate-700 shadow-xs backdrop-blur-md transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 active:scale-95"
+        >
+          <svg class="h-3.5 w-3.5 text-slate-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span>Login</span>
+        </button>
+      `;
+      const btn = document.getElementById('top-profile-login-btn');
+      if (btn) {
+        btn.addEventListener('click', () => {
+          openAuthModal();
+        });
+      }
+      return;
+    }
+
+    const name = currentUser.name || 'User';
+    const email = currentUser.email || '';
+    const institution = currentUser.institution || '';
+    const rawAvatar = currentUser.avatar || '';
+    let avatarUrl = '';
+    if (rawAvatar) {
+      avatarUrl = rawAvatar.startsWith('http') ? rawAvatar : `https://hscstack.site${rawAvatar}`;
+    }
+    const initials = name
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map(part => part[0].toUpperCase())
+      .join('');
+
+    const avatarHtml = avatarUrl
+      ? `<img src="${avatarUrl}" alt="${name}" class="h-7 w-7 rounded-full object-cover ring-1 ring-slate-200" onerror="this.outerHTML='<div class=\\'flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-teal-500 to-indigo-600 text-[11px] font-bold text-white shadow-xs\\'>${initials || 'U'}</div>'" />`
+      : `<div class="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-tr from-teal-500 to-indigo-600 text-[11px] font-bold text-white shadow-xs">${initials || 'U'}</div>`;
+
+    const dropdownAvatarHtml = avatarUrl
+      ? `<img src="${avatarUrl}" alt="${name}" class="h-11 w-11 rounded-full object-cover ring-2 ring-teal-50 shrink-0" onerror="this.outerHTML='<div class=\\'flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-tr from-teal-500 to-indigo-600 text-sm font-bold text-white shadow-xs\\'>${initials || 'U'}</div>'" />`
+      : `<div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-tr from-teal-500 to-indigo-600 text-sm font-bold text-white shadow-xs">${initials || 'U'}</div>`;
+
+    container.innerHTML = `
+      <div class="relative inline-block text-left" id="profile-widget-root">
+        <button
+          type="button"
+          id="profile-card-toggle"
+          class="group flex items-center gap-2.5 rounded-full border border-slate-200/90 bg-white/95 py-1 pl-1.5 pr-3 shadow-xs backdrop-blur-md transition hover:border-slate-300 hover:shadow-md active:scale-95"
+        >
+          ${avatarHtml}
+          <div class="text-left hidden sm:block">
+            <p class="text-xs font-semibold text-slate-800 line-clamp-1 max-w-[130px] leading-tight">${name}</p>
+            <p class="text-[10px] text-slate-400 font-medium leading-none">Manage Profile</p>
+          </div>
+          <svg class="h-3.5 w-3.5 text-slate-400 group-hover:text-slate-600 transition-transform duration-200" id="profile-card-chevron" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+
+        <div
+          id="profile-dropdown-menu"
+          class="hidden absolute right-0 mt-2 w-72 origin-top-right rounded-2xl border border-slate-100 bg-white p-4 shadow-xl ring-1 ring-black/5 z-50 transition-all duration-150 text-left"
+        >
+          <div class="flex items-center gap-3 border-b border-slate-100 pb-3 mb-3">
+            ${dropdownAvatarHtml}
+            <div class="min-w-0 flex-1">
+              <h4 class="text-sm font-bold text-slate-900 truncate">${name}</h4>
+              <p class="text-xs text-slate-500 truncate">${email}</p>
+              ${institution ? `<span class="mt-1 inline-block text-[10px] font-medium text-teal-700 bg-teal-50 rounded px-1.5 py-0.5 truncate max-w-full">${institution}</span>` : ''}
+            </div>
+          </div>
+
+          <div class="space-y-1">
+            <a
+              href="https://hscstack.site/profile"
+              target="_blank"
+              class="flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition-colors group"
+            >
+              <div class="flex items-center gap-2.5">
+                <div class="flex h-6 w-6 items-center justify-center rounded-lg bg-teal-50 text-teal-600">
+                  <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                </div>
+                <span>Manage Profile & Settings</span>
+              </div>
+              <svg class="h-3.5 w-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+
+            <a
+              href="https://hscstack.site"
+              target="_blank"
+              class="flex items-center justify-between gap-2 rounded-xl px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 transition-colors"
+            >
+              <div class="flex items-center gap-2.5">
+                <div class="flex h-6 w-6 items-center justify-center rounded-lg bg-slate-100 text-slate-500">
+                  <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                  </svg>
+                </div>
+                <span>HSCStack Main</span>
+              </div>
+              <span class="text-[10px] text-slate-400">Visit ↗</span>
+            </a>
+          </div>
+
+          <div class="mt-3 border-t border-slate-100 pt-2.5 flex items-center justify-between text-[11px]">
+            <span class="inline-flex items-center gap-1.5 text-emerald-600 font-medium">
+              <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Logged in
+            </span>
+            <a
+              href="https://hscstack.site/logout"
+              class="font-semibold text-rose-500 hover:text-rose-700 transition-colors"
+            >
+              Logout
+            </a>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const toggle = document.getElementById('profile-card-toggle');
+    const menu = document.getElementById('profile-dropdown-menu');
+    const chevron = document.getElementById('profile-card-chevron');
+
+    if (toggle && menu) {
+      toggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = !menu.classList.contains('hidden');
+        if (isOpen) {
+          menu.classList.add('hidden');
+          if (chevron) chevron.classList.remove('rotate-180');
+        } else {
+          menu.classList.remove('hidden');
+          if (chevron) chevron.classList.add('rotate-180');
+        }
+      });
+
+      document.addEventListener('click', (e) => {
+        const root = document.getElementById('profile-widget-root');
+        if (root && !root.contains(e.target)) {
+          menu.classList.add('hidden');
+          if (chevron) chevron.classList.remove('rotate-180');
+        }
+      });
+    }
   }
 
   function openAuthModal() {
