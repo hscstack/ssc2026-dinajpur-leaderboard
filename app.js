@@ -144,6 +144,8 @@ document.addEventListener('DOMContentLoaded', () => {
       applyFilters();
       
       // Event Listeners
+      searchInput.addEventListener('click', handleSearchFocusOrClick);
+      searchInput.addEventListener('focus', handleSearchFocusOrClick);
       searchInput.addEventListener('input', handleSearchInput);
       btnSelectDistrict.addEventListener('click', () => openSelectionModal('district'));
       btnSelectSchool.addEventListener('click', () => openSelectionModal('school'));
@@ -254,29 +256,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function openAuthModal() {
     if (!authModal) return;
-    authModal.classList.remove('hidden', 'pointer-events-none', 'opacity-0');
-    authModal.classList.add('opacity-100');
-    authModalInner.classList.remove('scale-95');
-    authModalInner.classList.add('scale-100');
+    authModal.classList.remove('hidden');
+    setTimeout(() => {
+      authModal.classList.add('opacity-100');
+      authModal.classList.remove('opacity-0', 'pointer-events-none');
+      authModalInner.classList.remove('scale-95', 'translate-y-8');
+      authModalInner.classList.add('scale-100', 'translate-y-0');
+    }, 10);
   }
 
   function closeAuthModal() {
     if (!authModal) return;
     authModal.classList.remove('opacity-100');
     authModal.classList.add('opacity-0', 'pointer-events-none');
-    authModalInner.classList.add('scale-95');
-    authModalInner.classList.remove('scale-100');
+    authModalInner.classList.add('scale-95', 'translate-y-8');
+    authModalInner.classList.remove('scale-100', 'translate-y-0');
+    setTimeout(() => {
+      authModal.classList.add('hidden');
+    }, 300);
+  }
+
+  async function handleSearchFocusOrClick() {
+    const authenticated = await checkUserAuth();
+    if (!authenticated) {
+      searchInput.blur();
+      openAuthModal();
+    }
   }
 
   async function handleSearchInput() {
-    const query = searchInput.value.trim();
-    if (query.length > 0) {
-      const authenticated = await checkUserAuth();
-      if (!authenticated) {
-        searchInput.value = '';
-        openAuthModal();
-        return;
-      }
+    const authenticated = await checkUserAuth();
+    if (!authenticated) {
+      searchInput.value = '';
+      searchInput.blur();
+      openAuthModal();
+      return;
     }
     handleFilterChange();
   }
