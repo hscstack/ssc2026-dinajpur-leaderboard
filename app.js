@@ -72,7 +72,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const welcomeModalInner = document.getElementById('welcome-modal-inner');
   const welcomeClose = document.getElementById('welcome-close');
 
+  const authModal = document.getElementById('auth-modal');
+  const authModalInner = document.getElementById('auth-modal-inner');
+  const authModalClose = document.getElementById('auth-modal-close');
+  const authLoginBtn = document.getElementById('auth-login-btn');
+
   // State
+  let isLoggedIn = null;
   let rawData = [];
   let filteredData = [];
   let currentPage = 1;
@@ -138,10 +144,24 @@ document.addEventListener('DOMContentLoaded', () => {
       applyFilters();
       
       // Event Listeners
-      searchInput.addEventListener('input', handleFilterChange);
+      searchInput.addEventListener('input', handleSearchInput);
       btnSelectDistrict.addEventListener('click', () => openSelectionModal('district'));
       btnSelectSchool.addEventListener('click', () => openSelectionModal('school'));
       btnSelectGroup.addEventListener('click', () => openSelectionModal('group'));
+
+      if (authModalClose) {
+        authModalClose.addEventListener('click', closeAuthModal);
+      }
+      if (authModal) {
+        authModal.addEventListener('click', (e) => {
+          if (e.target === authModal) closeAuthModal();
+        });
+      }
+      if (authLoginBtn) {
+        authLoginBtn.addEventListener('click', () => {
+          window.location.href = 'https://hscstack.site/login?redirect=' + encodeURIComponent(window.location.href);
+        });
+      }
 
       selectionModalClose.addEventListener('click', closeSelectionModal);
       selectionModal.addEventListener('click', (e) => {
@@ -212,6 +232,53 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('Error loading data:', error);
       showState('error');
     }
+  }
+
+  async function checkUserAuth() {
+    if (isLoggedIn !== null) return isLoggedIn;
+    try {
+      const res = await fetch('https://hscstack.site/profile', {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'X-Inertia': 'true',
+          'X-Inertia-Version': ''
+        }
+      });
+      isLoggedIn = res.ok;
+    } catch (e) {
+      isLoggedIn = false;
+    }
+    return isLoggedIn;
+  }
+
+  function openAuthModal() {
+    if (!authModal) return;
+    authModal.classList.remove('hidden', 'pointer-events-none', 'opacity-0');
+    authModal.classList.add('opacity-100');
+    authModalInner.classList.remove('scale-95');
+    authModalInner.classList.add('scale-100');
+  }
+
+  function closeAuthModal() {
+    if (!authModal) return;
+    authModal.classList.remove('opacity-100');
+    authModal.classList.add('opacity-0', 'pointer-events-none');
+    authModalInner.classList.add('scale-95');
+    authModalInner.classList.remove('scale-100');
+  }
+
+  async function handleSearchInput() {
+    const query = searchInput.value.trim();
+    if (query.length > 0) {
+      const authenticated = await checkUserAuth();
+      if (!authenticated) {
+        searchInput.value = '';
+        openAuthModal();
+        return;
+      }
+    }
+    handleFilterChange();
   }
 
   function handleFilterChange() {
