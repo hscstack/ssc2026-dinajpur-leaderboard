@@ -304,6 +304,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (rawImage) {
       imageUrl = rawImage.startsWith('http') ? rawImage : `https://hscstack.site${rawImage}`;
     }
+    const profileUrl = currentUser.username
+      ? `https://hscstack.site/u/${encodeURIComponent(currentUser.username)}`
+      : 'https://hscstack.site/profile';
     const initial = name.trim().charAt(0).toUpperCase() || 'U';
 
     const avatarHtml = imageUrl
@@ -342,7 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           <div class="py-1">
             <a
-              href="https://hscstack.site/profile"
+              href="${profileUrl}"
               target="_blank"
               class="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50 hover:text-slate-900"
             >
@@ -350,7 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
-              <span>Profile Settings</span>
+              <span>Profile</span>
             </a>
           </div>
         </div>
