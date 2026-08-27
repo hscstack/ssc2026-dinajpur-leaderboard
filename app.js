@@ -122,10 +122,15 @@ document.addEventListener('DOMContentLoaded', () => {
   init();
 
   async function init() {
-    checkUserAuth();
     try {
       showState('loading');
-      const response = await fetch('data/leaderboard.json');
+
+      // Check auth and fetch leaderboard data in parallel during the initial loading phase
+      const [, response] = await Promise.all([
+        checkUserAuth(),
+        fetch('data/leaderboard.json')
+      ]);
+
       if (!response.ok) throw new Error('Failed to fetch leaderboard index');
       const indexData = await response.json();
       
@@ -170,14 +175,12 @@ document.addEventListener('DOMContentLoaded', () => {
       searchInput.addEventListener('click', handleSearchFocusOrClick);
       searchInput.addEventListener('focus', handleSearchFocusOrClick);
       searchInput.addEventListener('input', handleSearchInput);
-      btnSelectDistrict.addEventListener('click', async () => {
-        const auth = await checkUserAuth();
-        if (!auth) return openAuthModal();
+      btnSelectDistrict.addEventListener('click', () => {
+        if (isLoggedIn === false) return openAuthModal();
         openSelectionModal('district');
       });
-      btnSelectSchool.addEventListener('click', async () => {
-        const auth = await checkUserAuth();
-        if (!auth) return openAuthModal();
+      btnSelectSchool.addEventListener('click', () => {
+        if (isLoggedIn === false) return openAuthModal();
         openSelectionModal('school');
       });
       btnSelectGroup.addEventListener('click', () => openSelectionModal('group'));
@@ -462,17 +465,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 300);
   }
 
-  async function handleSearchFocusOrClick() {
-    const authenticated = await checkUserAuth();
-    if (!authenticated) {
+  function handleSearchFocusOrClick() {
+    if (isLoggedIn === false) {
       searchInput.blur();
       openAuthModal();
     }
   }
 
-  async function handleSearchInput() {
-    const authenticated = await checkUserAuth();
-    if (!authenticated) {
+  function handleSearchInput() {
+    if (isLoggedIn === false) {
       searchInput.value = '';
       searchInput.blur();
       openAuthModal();
