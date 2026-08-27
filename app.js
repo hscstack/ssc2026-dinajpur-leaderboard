@@ -77,9 +77,30 @@ document.addEventListener('DOMContentLoaded', () => {
   const authModalClose = document.getElementById('auth-modal-close');
   const authLoginBtn = document.getElementById('auth-login-btn');
 
+  const AUTH_STORAGE_KEY = 'hscstack_auth_user';
+
   // State
   let isLoggedIn = null;
   let currentUser = null;
+  let inFlightAuthPromise = null;
+
+  // Restore authenticated session instantly from localStorage
+  try {
+    const cachedAuth = localStorage.getItem(AUTH_STORAGE_KEY);
+    if (cachedAuth) {
+      const parsed = JSON.parse(cachedAuth);
+      if (parsed && parsed.authenticated && parsed.user) {
+        isLoggedIn = true;
+        currentUser = parsed.user;
+      }
+    }
+  } catch (e) {
+    // Ignore JSON parse errors
+  }
+
+  // Render initial profile state immediately (0ms delay)
+  renderUserProfileWidget();
+
   let rawData = [];
   let filteredData = [];
   let currentPage = 1;
@@ -246,27 +267,55 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  async function checkUserAuth() {
-    if (isLoggedIn !== null) return isLoggedIn;
-    try {
-      const res = await fetch('https://hscstack.site/api/auth/status', {
-        method: 'GET',
-        credentials: 'include'
-      });
-      if (res.ok) {
-        const data = await res.json();
-        isLoggedIn = Boolean(data.authenticated);
-        currentUser = data.user || null;
-      } else {
-        isLoggedIn = false;
-        currentUser = null;
-      }
-    } catch (e) {
-      isLoggedIn = false;
-      currentUser = null;
+  async function checkUserAuth(force = false) {
+    if (!force && isLoggedIn === true) {
+      return true;
     }
-    renderUserProfileWidget();
-    return isLoggedIn;
+
+    if (inFlightAuthPromise) {
+      return inFlightAuthPromise;
+    }
+
+    inFlightAuthPromise = (async () => {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4000);
+
+        const res = await fetch('https://hscstack.site/api/auth/status', {
+          method: 'GET',
+          credentials: 'include',
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
+        if (res.ok) {
+          const data = await res.json();
+          isLoggedIn = Boolean(data.authenticated);
+          currentUser = data.user || null;
+          if (isLoggedIn && currentUser) {
+            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ authenticated: true, user: currentUser }));
+          } else {
+            localStorage.removeItem(AUTH_STORAGE_KEY);
+          }
+        } else {
+          isLoggedIn = false;
+          currentUser = null;
+          localStorage.removeItem(AUTH_STORAGE_KEY);
+        }
+      } catch (e) {
+        // Network timeout / error: keep current optimistic login status if present
+        if (isLoggedIn === null) {
+          isLoggedIn = false;
+          currentUser = null;
+        }
+      } finally {
+        inFlightAuthPromise = null;
+        renderUserProfileWidget();
+      }
+      return isLoggedIn;
+    })();
+
+    return inFlightAuthPromise;
   }
 
   function renderUserProfileWidget() {
