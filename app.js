@@ -277,9 +277,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     inFlightAuthPromise = (async () => {
+      let serverErrorOrTimeout = false;
+
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 4000);
+        const timeoutId = setTimeout(() => controller.abort(), 2500);
 
         const res = await fetch('https://hscstack.site/api/auth/status', {
           method: 'GET',
@@ -298,21 +300,23 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.removeItem(AUTH_STORAGE_KEY);
           }
         } else {
-          isLoggedIn = false;
-          currentUser = null;
-          localStorage.removeItem(AUTH_STORAGE_KEY);
+          // Server returned error (500, 502, 503, etc.) - don't block user
+          serverErrorOrTimeout = true;
         }
       } catch (e) {
-        // Network timeout / error: keep current optimistic login status if present
-        if (isLoggedIn === null) {
-          isLoggedIn = false;
-          currentUser = null;
-        }
+        // Network timeout / offline / connection failed - don't block user
+        serverErrorOrTimeout = true;
       } finally {
         inFlightAuthPromise = null;
         renderUserProfileWidget();
       }
-      return isLoggedIn;
+
+      // If server is down, struggling, or timed out, gracefully allow search and filter
+      if (serverErrorOrTimeout) {
+        return true;
+      }
+
+      return Boolean(isLoggedIn);
     })();
 
     return inFlightAuthPromise;
