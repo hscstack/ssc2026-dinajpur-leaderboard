@@ -270,8 +270,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  async function checkUserAuth(force = false) {
-    if (!force && isLoggedIn === true) {
+  async function checkUserAuth() {
+    // If user has ever logged in on this device, skip network check entirely
+    if (isLoggedIn === true) {
       return true;
     }
 
@@ -295,12 +296,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (res.ok) {
           const data = await res.json();
-          isLoggedIn = Boolean(data.authenticated);
-          currentUser = data.user || null;
-          if (isLoggedIn && currentUser) {
+          if (data.authenticated) {
+            isLoggedIn = true;
+            currentUser = data.user || { name: 'User' };
+            // Save permanently so we never fetch for this user again
             localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ authenticated: true, user: currentUser }));
           } else {
-            localStorage.removeItem(AUTH_STORAGE_KEY);
+            isLoggedIn = false;
+            currentUser = null;
           }
         } else {
           // Server returned error (500, 502, 503, etc.) - don't block user
