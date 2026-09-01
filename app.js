@@ -2,10 +2,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // DOM Elements
   const searchInput = document.getElementById('search-input');
   const btnSelectDistrict = document.getElementById('btn-select-district');
+  const btnSelectUpazila = document.getElementById('btn-select-upazila');
   const btnSelectSchool = document.getElementById('btn-select-school');
   const btnSelectGroup = document.getElementById('btn-select-group');
   
   const labelDistrict = document.getElementById('label-district');
+  const labelUpazila = document.getElementById('label-upazila');
   const labelSchool = document.getElementById('label-school');
   const labelGroup = document.getElementById('label-group');
 
@@ -107,16 +109,18 @@ document.addEventListener('DOMContentLoaded', () => {
   let itemsPerPage = 25;
 
   let selectedDistrict = 'all';
+  let selectedUpazila = 'all';
   let selectedSchool = 'all';
   let selectedGroup = 'all';
 
   let districtsList = [];
+  let upazilasList = [];
+  let districtUpazilasMap = {};
   let schoolsList = [];
   let groupsList = [];
-  let filesList = [];
 
-  // Cache for loaded school detail JSONs
-  const schoolDetailsCache = new Map();
+  // Cache for loaded transcript chunks (by 3-digit roll prefix)
+  const transcriptsCache = new Map();
 
   // Initialization
   init();
@@ -135,31 +139,31 @@ document.addEventListener('DOMContentLoaded', () => {
       const indexData = await response.json();
       
       districtsList = indexData.districts || [];
+      upazilasList = indexData.upazilas || [];
+      districtUpazilasMap = indexData.district_upazilas || {};
       schoolsList = indexData.schools || [];
       groupsList = indexData.groups || [];
-      filesList = indexData.files || [];
 
       // Unpack compact rows:
-      // [id, name, school_idx, dist_idx, grp_idx, gpa, mark, globalRank, passed_flag, roll, file_idx, file_inner_idx]
+      // [id, name, school_idx, upz_idx, dist_idx, grp_idx, gpa, mark, globalRank, is_passed, roll]
       rawData = (indexData.students || []).map(row => {
         const schoolName = row[2] >= 0 ? schoolsList[row[2]] : '';
-        const districtName = row[3] >= 0 ? districtsList[row[3]] : '';
-        const groupName = row[4] >= 0 ? groupsList[row[4]] : '';
-        const fileName = row[10] >= 0 ? filesList[row[10]] : '';
+        const upazilaName = row[3] >= 0 ? upazilasList[row[3]] : '';
+        const districtName = row[4] >= 0 ? districtsList[row[4]] : '';
+        const groupName = row[5] >= 0 ? groupsList[row[5]] : '';
 
         return {
           id: row[0],
           name: row[1],
           school: schoolName,
+          upazila: upazilaName,
           district: districtName,
           group: groupName,
-          gpa: row[5],
-          mark: row[6],
-          globalRank: row[7],
-          status: row[8] === 1 ? 'PASSED' : 'FAILED',
-          roll: row[9] || '',
-          file: fileName,
-          file_idx: row[11],
+          gpa: row[6],
+          mark: row[7],
+          globalRank: row[8],
+          status: row[9] === 1 ? 'PASSED' : 'FAILED',
+          roll: row[10] || '',
           grades: null // loaded on demand when modal opens
         };
       });
@@ -179,6 +183,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isLoggedIn === false) return openAuthModal();
         openSelectionModal('district');
       });
+      if (btnSelectUpazila) {
+        btnSelectUpazila.addEventListener('click', () => {
+          if (isLoggedIn === false) return openAuthModal();
+          openSelectionModal('upazila');
+        });
+      }
       btnSelectSchool.addEventListener('click', () => {
         if (isLoggedIn === false) return openAuthModal();
         openSelectionModal('school');
@@ -500,16 +510,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchTerm = searchInput.value.toLowerCase().trim();
 
     let contextData = rawData.filter(student => {
-      const matchSchool = selectedSchool === 'all' || 
-                         (student.school && student.school.toUpperCase() === selectedSchool);
       const matchDistrict = selectedDistrict === 'all' ||
                            (student.district && student.district.toUpperCase() === selectedDistrict);
+      const matchUpazila = selectedUpazila === 'all' ||
+                          (student.upazila && student.upazila.toUpperCase() === selectedUpazila);
+      const matchSchool = selectedSchool === 'all' || 
+                         (student.school && student.school.toUpperCase() === selectedSchool);
       const matchGroup = selectedGroup === 'all' ||
                         (student.group && student.group.toUpperCase() === selectedGroup);
-      return matchSchool && matchDistrict && matchGroup;
+      return matchDistrict && matchUpazila && matchSchool && matchGroup;
     });
 
-    const hasContextFilter = selectedSchool !== 'all' || selectedDistrict !== 'all' || selectedGroup !== 'all';
+    const hasContextFilter = selectedDistrict !== 'all' || selectedUpazila !== 'all' || selectedSchool !== 'all' || selectedGroup !== 'all';
 
     if (hasContextFilter) {
       // Sort by GPA (desc) then Mark (desc) to ensure correct ranking order in filtered view
@@ -540,7 +552,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Apply text search on top of context data
     filteredData = contextData.filter(student => {
-      return !searchTerm || (student.name && student.name.toLowerCase().includes(searchTerm));
+      if (!searchTerm) return true;
+      return (student.name && student.name.toLowerCase().includes(searchTerm)) ||
+             (student.roll && student.roll.includes(searchTerm)) ||
+             (student.school && student.school.toLowerCase().includes(searchTerm)) ||
+             (student.upazila && student.upazila.toLowerCase().includes(searchTerm));
     });
 
     if (pageTitleText) {
@@ -548,6 +564,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (selectedSchool !== 'all') {
         const displayName = selectedSchool.length > 25 ? selectedSchool.substring(0, 25) + '...' : selectedSchool;
         titleParts.push(displayName);
+      } else if (selectedUpazila !== 'all') {
+        titleParts.push(selectedUpazila);
       } else if (selectedDistrict !== 'all') {
         titleParts.push(selectedDistrict);
       }
@@ -814,6 +832,12 @@ document.addEventListener('DOMContentLoaded', () => {
       title = 'Select District';
       list = districtsList;
       selectionModalSearchContainer.classList.remove('hidden');
+    } else if (type === 'upazila') {
+      title = selectedDistrict !== 'all' ? `Select Upazila (${selectedDistrict})` : 'Select Upazila';
+      list = (selectedDistrict !== 'all' && districtUpazilasMap[selectedDistrict]) 
+             ? districtUpazilasMap[selectedDistrict] 
+             : upazilasList;
+      selectionModalSearchContainer.classList.remove('hidden');
     } else if (type === 'school') {
       title = 'Select School';
       list = schoolsList;
@@ -870,6 +894,22 @@ document.addEventListener('DOMContentLoaded', () => {
       labelDistrict.title = value === 'all' ? 'All Districts' : value;
       if (value !== 'all') labelDistrict.classList.add('text-teal-700');
       else labelDistrict.classList.remove('text-teal-700');
+
+      // Reset upazila filter if the current upazila does not belong to newly selected district
+      if (selectedDistrict !== 'all' && selectedUpazila !== 'all') {
+        const allowedUpzs = districtUpazilasMap[selectedDistrict] || [];
+        if (!allowedUpzs.includes(selectedUpazila)) {
+          selectedUpazila = 'all';
+          labelUpazila.textContent = 'All Upazilas';
+          labelUpazila.classList.remove('text-teal-700');
+        }
+      }
+    } else if (currentSelectionType === 'upazila') {
+      selectedUpazila = value;
+      labelUpazila.textContent = value === 'all' ? 'All Upazilas' : value;
+      labelUpazila.title = value === 'all' ? 'All Upazilas' : value;
+      if (value !== 'all') labelUpazila.classList.add('text-teal-700');
+      else labelUpazila.classList.remove('text-teal-700');
     } else if (currentSelectionType === 'school') {
       selectedSchool = value;
       labelSchool.textContent = value === 'all' ? 'All Schools' : value;
@@ -917,7 +957,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     modalGpa.textContent = typeof student.gpa === 'number' ? student.gpa.toFixed(2) : student.gpa;
-    modalMarks.textContent = student.mark;
+    modalMarks.textContent = student.mark > 0 ? student.mark : '-';
     
     modalStatus.textContent = student.status || 'UNKNOWN';
     if (student.status && student.status.toUpperCase() !== 'PASSED') {
@@ -936,7 +976,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Lazy load grades if not already loaded
-    if (!student.grades && student.file) {
+    if (!student.grades && student.roll) {
       modalGradesSection.classList.remove('hidden');
       modalGrades.innerHTML = `
         <div class="col-span-full py-4 text-center text-xs font-medium text-slate-400">
@@ -944,30 +984,36 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       `;
       
+      const rollStr = String(student.roll).trim();
+      const prefix = rollStr.length >= 3 ? rollStr.slice(0, 3) : 'other';
+
       try {
-        let schoolRecords;
-        if (schoolDetailsCache.has(student.file)) {
-          schoolRecords = schoolDetailsCache.get(student.file);
+        let chunk;
+        if (transcriptsCache.has(prefix)) {
+          chunk = transcriptsCache.get(prefix);
         } else {
-          const res = await fetch(`data/${student.file}`);
+          const res = await fetch(`data/transcripts/${prefix}.json`);
           if (res.ok) {
-            schoolRecords = await res.json();
-            schoolDetailsCache.set(student.file, schoolRecords);
+            chunk = await res.json();
+            transcriptsCache.set(prefix, chunk);
           }
         }
 
-        if (schoolRecords && schoolRecords[student.file_idx]) {
-          const detail = schoolRecords[student.file_idx];
-          student.grades = detail.grades || {};
+        if (chunk && chunk[rollStr]) {
+          student.grades = chunk[rollStr];
         }
       } catch (err) {
-        console.error('Failed to load student grade detail:', err);
+        console.error('Failed to load student transcript detail:', err);
       }
     }
     
-    if (student.grades && Object.keys(student.grades).length > 0) {
+    if (student.grades && (Array.isArray(student.grades) ? student.grades.length > 0 : Object.keys(student.grades).length > 0)) {
       modalGrades.innerHTML = '';
-      for (const [subject, grade] of Object.entries(student.grades)) {
+      const gradeItems = Array.isArray(student.grades)
+        ? student.grades.map(g => ({ subject: g.subject_name || g.subject || 'Subject', grade: g.grade || '-' }))
+        : Object.entries(student.grades).map(([subject, grade]) => ({ subject, grade }));
+
+      gradeItems.forEach(({ subject, grade }) => {
         let gradeColor = 'text-slate-700 bg-slate-100';
         if (grade === 'A+') gradeColor = 'text-emerald-700 bg-emerald-100';
         else if (grade === 'A') gradeColor = 'text-teal-700 bg-teal-100';
@@ -978,10 +1024,10 @@ document.addEventListener('DOMContentLoaded', () => {
         row.className = 'flex justify-between items-center py-1.5 px-3 bg-slate-50 rounded-lg border border-slate-100';
         row.innerHTML = `
           <span class="text-xs font-semibold text-slate-600 truncate mr-2" title="${escapeHTML(subject)}">${escapeHTML(subject)}</span>
-          <span class="inline-flex items-center justify-center px-2 py-0.5 rounded text-xs font-bold shrink-0 ${gradeColor}">${grade}</span>
+          <span class="inline-flex items-center justify-center px-2 py-0.5 rounded text-xs font-bold shrink-0 ${gradeColor}">${escapeHTML(grade)}</span>
         `;
         modalGrades.appendChild(row);
-      }
+      });
       modalGradesSection.classList.remove('hidden');
     } else {
       modalGradesSection.classList.add('hidden');
