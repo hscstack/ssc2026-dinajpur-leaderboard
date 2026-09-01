@@ -1,0 +1,13 @@
+{
+  "name": "ssc2026-dinajpur-leaderboard",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "live-server --port=5174 --no-browser --ignore=data",
+    "serve": "live-server --port=5174 --no-browser --ignore=data",
+    "build": "python run.py"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}
