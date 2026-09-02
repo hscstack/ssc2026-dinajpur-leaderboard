@@ -320,6 +320,157 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
+  const CHUNK_SIZE = 75; // 3 pages of 25 students per chunk
+  let metaData = null;
+  let scopeTotals = {};
+  const loadedChunks = new Map(); // scopeKey -> Set of chunk indices
+  const scopeStudents = new Map(); // scopeKey -> Array of students
+  const loadedSearchShards = new Set();
+  let inFlightChunkPromises = new Map();
+
+  function unpackStudentRow(row) {
+    const schoolName = row[2] >= 0 ? schoolsList[row[2]] : '';
+    const upazilaName = row[3] >= 0 ? upazilasList[row[3]] : '';
+    const districtName = row[4] >= 0 ? districtsList[row[4]] : '';
+    const groupName = row[5] >= 0 ? groupsList[row[5]] : 'SCIENCE';
+    const tierName = row[12] >= 0 ? tiersList[row[12]] : 'INELIGIBLE';
+
+    return {
+      id: row[0],
+      name: row[1],
+      school: schoolName,
+      upazila: upazilaName,
+      district: districtName,
+      group: groupName,
+      gpa: row[6],
+      mark: row[7],
+      globalRank: row[8],
+      status: row[9] === 1 ? 'PASSED' : 'FAILED',
+      roll: row[10] || '',
+      scholarshipProb: row[11] || 0,
+      scholarshipTier: tierName,
+      gender: row[13] === 2 ? 'FEMALE' : 'MALE',
+      candidateType: row[14] === 1 ? 'REGULAR' : 'IRREGULAR',
+      hasTranscript: row[15] === 1
+    };
+  }
+
+  function getActiveScopeKey() {
+    const d = selectedDistrict === 'all' ? 'ALL' : selectedDistrict;
+    const u = selectedUpazila === 'all' ? 'ALL' : selectedUpazila;
+    const g = selectedGroup === 'all' ? 'ALL' : selectedGroup;
+
+    if (d === 'ALL' && u === 'ALL' && g === 'ALL') return 'all';
+    if (d === 'ALL' && u === 'ALL' && g !== 'ALL') return `ALL_${g}`.replace(/\s+/g, '_');
+    if (d !== 'ALL' && u === 'ALL' && g === 'ALL') return `${d}_ALL`.replace(/\s+/g, '_');
+    if (d !== 'ALL' && u === 'ALL' && g !== 'ALL') return `${d}_${g}`.replace(/\s+/g, '_');
+    if (d !== 'ALL' && u !== 'ALL' && g === 'ALL') return `${d}_${u}_ALL`.replace(/\s+/g, '_');
+    return `${d}_${u}_${g}`.replace(/\s+/g, '_');
+  }
+
+  function getActiveScopeTotal() {
+    const scopeKey = getActiveScopeKey();
+    if (scopeKey === 'all') return metaData?.total_students || rawData.length || 142875;
+    const keyFormatted = scopeKey.replace(/\s+/g, '_');
+    if (scopeTotals[keyFormatted] !== undefined) return scopeTotals[keyFormatted];
+    return (scopeStudents.get(scopeKey) || []).length;
+  }
+
+  async function ensureChunkLoaded(scopeKey, chunkIdx) {
+    const cacheKey = `${scopeKey}_${chunkIdx}`;
+    if (!loadedChunks.has(scopeKey)) {
+      loadedChunks.set(scopeKey, new Set());
+    }
+    const chunkSet = loadedChunks.get(scopeKey);
+    if (chunkSet.has(chunkIdx)) return;
+
+    if (inFlightChunkPromises.has(cacheKey)) {
+      return inFlightChunkPromises.get(cacheKey);
+    }
+
+    const promise = (async () => {
+      try {
+        const chunkPath = `data/chunks/${scopeKey}/${chunkIdx}.json`;
+        const res = await fetch(chunkPath);
+        if (res.ok) {
+          const rows = await res.json();
+          const newStudents = rows.map(unpackStudentRow);
+
+          if (!scopeStudents.has(scopeKey)) {
+            scopeStudents.set(scopeKey, []);
+          }
+          const existing = scopeStudents.get(scopeKey);
+          const existingIds = new Set(existing.map(s => s.id));
+          newStudents.forEach(s => {
+            if (!existingIds.has(s.id)) {
+              existing.push(s);
+              existingIds.add(s.id);
+            }
+          });
+
+          // Also keep in rawData
+          const rawIds = new Set(rawData.map(s => s.id));
+          newStudents.forEach(s => {
+            if (!rawIds.has(s.id)) {
+              rawData.push(s);
+              rawIds.add(s.id);
+            }
+          });
+
+          chunkSet.add(chunkIdx);
+        }
+      } catch (e) {
+        // Chunk might not exist if end of data
+      } finally {
+        inFlightChunkPromises.delete(cacheKey);
+      }
+    })();
+
+    inFlightChunkPromises.set(cacheKey, promise);
+    return promise;
+  }
+
+  async function fetchSearchShardsForQuery(query) {
+    const q = query.trim().toLowerCase();
+    if (q.length < 2) return;
+
+    const prefixes = new Set();
+    if (/^\d+$/.test(q)) {
+      prefixes.add(q.slice(0, 2));
+      if (q.length >= 3) prefixes.add(q.slice(0, 3));
+    } else {
+      const words = q.split(/\s+/).filter(w => w.length >= 2);
+      words.forEach(w => prefixes.add(w.slice(0, 2)));
+    }
+
+    const promises = [];
+    for (const p of prefixes) {
+      const safeP = p.replace(/[^a-zA-Z0-9_-]/g, '');
+      if (!safeP || loadedSearchShards.has(safeP)) continue;
+      loadedSearchShards.add(safeP);
+
+      promises.push(
+        fetch(`data/search/${safeP}.json`)
+          .then(res => res.ok ? res.json() : [])
+          .then(rows => {
+            const newStudents = rows.map(unpackStudentRow);
+            const rawIds = new Set(rawData.map(s => s.id));
+            newStudents.forEach(s => {
+              if (!rawIds.has(s.id)) {
+                rawData.push(s);
+                rawIds.add(s.id);
+              }
+            });
+          })
+          .catch(() => {})
+      );
+    }
+
+    if (promises.length > 0) {
+      await Promise.all(promises);
+    }
+  }
+
   // Initialization
   init();
 
@@ -327,54 +478,38 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       showState('loading');
 
-      // Check auth and fetch leaderboard data in parallel
+      // Check auth and fetch lightweight metadata (128 KB) in parallel
       const [, response] = await Promise.all([
         checkUserAuth(),
-        fetch('data/leaderboard.json')
+        fetch('data/leaderboard_meta.json').then(r => r.ok ? r : fetch('data/leaderboard.json'))
       ]);
 
-      if (!response.ok) throw new Error('Failed to fetch leaderboard index');
+      if (!response.ok) throw new Error('Failed to fetch leaderboard metadata');
       const indexData = await response.json();
-      
+      metaData = indexData;
+
       districtsList = indexData.districts || [];
       upazilasList = indexData.upazilas || [];
       districtUpazilasMap = indexData.district_upazilas || {};
       schoolsList = indexData.schools || [];
       groupsList = indexData.groups || [];
       tiersList = indexData.tiers || [];
+      scopeTotals = indexData.scope_totals || {};
 
-      // Unpack compact rows:
-      // [id, name, school_idx, upz_idx, dist_idx, grp_idx, gpa, mark, globalRank, is_passed, roll, scholarship_prob, tier_idx, gender_code, is_regular, has_transcript]
-      rawData = (indexData.students || []).map(row => {
-        const schoolName = row[2] >= 0 ? schoolsList[row[2]] : '';
-        const upazilaName = row[3] >= 0 ? upazilasList[row[3]] : '';
-        const districtName = row[4] >= 0 ? districtsList[row[4]] : '';
-        const groupName = row[5] >= 0 ? groupsList[row[5]] : 'SCIENCE';
-        const tierName = row[12] >= 0 ? tiersList[row[12]] : 'INELIGIBLE';
+      // Unpack initial top students (3 pages = 75 students) for instant 0ms first render!
+      const initialRows = indexData.initial_students || indexData.students || [];
+      rawData = initialRows.map(unpackStudentRow);
 
-        return {
-          id: row[0],
-          name: row[1],
-          school: schoolName,
-          upazila: upazilaName,
-          district: districtName,
-          group: groupName,
-          gpa: row[6],
-          mark: row[7],
-          globalRank: row[8],
-          status: row[9] === 1 ? 'PASSED' : 'FAILED',
-          roll: row[10] || '',
-          scholarshipProb: row[11] || 0,
-          scholarshipTier: tierName,
-          gender: row[13] === 2 ? 'FEMALE' : 'MALE',
-          candidateType: row[14] === 1 ? 'REGULAR' : 'IRREGULAR',
-          hasTranscript: row[15] === 1
-        };
-      });
+      // Register chunk 0 as loaded for 'all' scope
+      loadedChunks.set('all', new Set([0]));
+      scopeStudents.set('all', [...rawData]);
+
+      // Pre-fetch chunk 1 in background immediately
+      ensureChunkLoaded('all', 1);
 
       updateScholarshipToggleUI();
       applyFilters();
-      
+
       // Event Listeners
       if (toggleScholarshipBtn) {
         toggleScholarshipBtn.addEventListener('click', () => {
@@ -388,17 +523,17 @@ document.addEventListener('DOMContentLoaded', () => {
       searchInput.addEventListener('click', handleSearchFocusOrClick);
       searchInput.addEventListener('focus', handleSearchFocusOrClick);
       searchInput.addEventListener('input', handleSearchInput);
-      
+
       btnSelectDistrict.addEventListener('click', () => {
         if (isLoggedIn === false) return openAuthModal();
         openSelectionModal('district');
       });
-      
+
       btnSelectUpazila.addEventListener('click', () => {
         if (isLoggedIn === false) return openAuthModal();
         openSelectionModal('upazila');
       });
-      
+
       btnSelectGroup.addEventListener('click', () => openSelectionModal('group'));
 
       if (authModalClose) {
@@ -422,7 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
       pageSizeSelect.addEventListener('change', handlePageSizeChange);
       btnPrev.addEventListener('click', () => changePage(-1));
       btnNext.addEventListener('click', () => changePage(1));
-      
+
       if (statSchoolsContainer) statSchoolsContainer.addEventListener('click', showSchoolsModal);
       if (statDistrictsContainer) statDistrictsContainer.addEventListener('click', showDistrictsModal);
 
@@ -463,7 +598,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (welcomeClose) {
         welcomeClose.addEventListener('click', closeWelcomeModal);
       }
-      
+
     } catch (error) {
       console.error('Error loading data:', error);
       showState('error');
@@ -655,18 +790,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function handleSearchInput() {
+  async function handleSearchInput() {
     if (isLoggedIn === false) {
       searchInput.value = '';
       searchInput.blur();
       openAuthModal();
       return;
     }
+    const q = searchInput.value.trim();
+    if (q.length >= 2) {
+      await fetchSearchShardsForQuery(q);
+    }
     handleFilterChange();
   }
 
-  function handleFilterChange() {
+  async function handleFilterChange() {
     currentPage = 1;
+    const scopeKey = getActiveScopeKey();
+    await ensureChunkLoaded(scopeKey, 0);
+    ensureChunkLoaded(scopeKey, 1);
     applyFilters();
   }
 
@@ -676,12 +818,20 @@ document.addEventListener('DOMContentLoaded', () => {
     renderLeaderboard();
   }
 
-  function applyFilters() {
+  async function applyFilters() {
     const rawSearch = searchInput.value.trim();
     const searchTerm = rawSearch.toLowerCase();
     const isRollSearch = /^\d{6,}$/.test(rawSearch);
+    const scopeKey = getActiveScopeKey();
 
-    let contextData = rawData.filter(student => {
+    // Ensure current scope chunk 0 is loaded
+    if (!loadedChunks.get(scopeKey)?.has(0)) {
+      await ensureChunkLoaded(scopeKey, 0);
+    }
+
+    let sourceData = scopeStudents.get(scopeKey) || rawData;
+
+    let contextData = sourceData.filter(student => {
       const matchDistrict = selectedDistrict === 'all' ||
                            (student.district && student.district.toUpperCase() === selectedDistrict);
       const matchUpazila = selectedUpazila === 'all' ||
@@ -742,7 +892,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (selectedGroup !== 'all') {
         titleParts.push(selectedGroup);
       }
-      
+
       if (titleParts.length > 0) {
         pageTitleText.textContent = `${titleParts.join(' - ')} Leaderboard`;
       } else {
@@ -751,8 +901,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     updateStats();
-    
-    if (filteredData.length === 0) {
+
+    if (filteredData.length === 0 && !searchTerm) {
+      showState('loading');
+    } else if (filteredData.length === 0) {
       showState('empty');
     } else {
       renderLeaderboard();
@@ -760,21 +912,26 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function updateStats() {
-    animateValue(statStudents, 0, filteredData.length, 1000);
-    
+    const totalCount = searchInput.value.trim() ? filteredData.length : getActiveScopeTotal();
+    animateValue(statStudents, 0, totalCount, 1000);
+
     const currentSchools = new Set();
     const currentDistricts = new Set();
     let gpa5Count = 0;
-    
+
     filteredData.forEach(s => {
       if (s.school) currentSchools.add(s.school.toUpperCase());
       if (s.district) currentDistricts.add(s.district.toUpperCase());
       if (parseFloat(s.gpa) === 5.0) gpa5Count++;
     });
-    
-    animateValue(statSchools, 0, currentSchools.size, 1000);
-    animateValue(statGpa5, 0, gpa5Count, 1000);
-    animateValue(statDistricts, 0, currentDistricts.size, 1000);
+
+    const displaySchools = currentSchools.size > 0 ? currentSchools.size : (metaData?.stats?.total_schools || 2729);
+    const displayDistricts = selectedDistrict !== 'all' ? 1 : (metaData?.stats?.total_districts || 8);
+    const displayGpa5 = gpa5Count > 0 ? gpa5Count : (metaData?.stats?.total_gpa5 || 18123);
+
+    animateValue(statSchools, 0, displaySchools, 1000);
+    animateValue(statGpa5, 0, displayGpa5, 1000);
+    animateValue(statDistricts, 0, displayDistricts, 1000);
   }
 
   function animateValue(obj, start, end, duration) {
@@ -792,23 +949,39 @@ document.addEventListener('DOMContentLoaded', () => {
     window.requestAnimationFrame(step);
   }
 
-  function renderLeaderboard() {
+  async function renderLeaderboard() {
     showState('leaderboard');
-    
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+    const totalItems = searchInput.value.trim() ? filteredData.length : getActiveScopeTotal();
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
     if (currentPage > totalPages && totalPages > 0) {
       currentPage = totalPages;
     }
-    
+
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = Math.min(startIndex + itemsPerPage, filteredData.length);
-    const pageData = filteredData.slice(startIndex, endIndex);
-    
+    let pageData = filteredData.slice(startIndex, endIndex);
+
+    // If we are navigating to a page that isn't loaded yet, fetch the needed chunk (2-3 pages per chunk)
+    const scopeKey = getActiveScopeKey();
+    const neededChunk = Math.floor(startIndex / CHUNK_SIZE);
+    if (!loadedChunks.get(scopeKey)?.has(neededChunk) && !searchInput.value.trim()) {
+      await ensureChunkLoaded(scopeKey, neededChunk);
+      // Pre-fetch next chunk (next 2-3 pages) in background
+      ensureChunkLoaded(scopeKey, neededChunk + 1);
+
+      const sourceData = scopeStudents.get(scopeKey) || rawData;
+      filteredData = sourceData;
+      pageData = filteredData.slice(startIndex, Math.min(startIndex + itemsPerPage, filteredData.length));
+    } else if (!searchInput.value.trim()) {
+      ensureChunkLoaded(scopeKey, neededChunk + 1);
+    }
+
     leaderboardBody.innerHTML = '';
-    
+
     pageData.forEach((student) => {
       const row = document.createElement('div');
-      
+
       let rankColor = 'text-slate-600 bg-slate-100 group-hover:bg-white group-hover:shadow-sm border border-transparent';
       let mobileRankBadge = 'bg-slate-100 text-slate-700';
       if (student.displayRank === 1) {
@@ -821,14 +994,14 @@ document.addEventListener('DOMContentLoaded', () => {
         rankColor = 'text-orange-800 bg-orange-50 border-orange-200 shadow-sm';
         mobileRankBadge = 'bg-orange-100 text-orange-800 border border-orange-200';
       }
-      
+
       const safeSchool = student.school ? student.school.toUpperCase() : 'N/A';
       const safeUpazila = student.upazila ? student.upazila.toUpperCase() : '';
       const safeGpa = typeof student.gpa === 'number' ? student.gpa.toFixed(2) : student.gpa;
       const schInfo = getScholarshipInfo(student);
 
       row.className = 'group flex flex-col sm:flex-row sm:items-center bg-white border border-slate-200 sm:border-0 sm:border-b sm:border-slate-100 rounded-2xl sm:rounded-none p-4 cursor-pointer hover:bg-slate-50/80 hover:border-indigo-200 sm:hover:border-transparent transition-all shadow-xs sm:shadow-none';
-      
+
       row.innerHTML = `
         <!-- Mobile View -->
         <div class="flex sm:hidden flex-col gap-2.5 w-full">
@@ -893,11 +1066,11 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
       `;
-      
+
       row.addEventListener('click', () => openModal(student));
       leaderboardBody.appendChild(row);
     });
-    
+
     renderPagination(totalPages);
   }
 

@@ -1,6 +1,7 @@
 import os
 import json
 import math
+import re
 from collections import defaultdict
 from pathlib import Path
 
@@ -35,6 +36,7 @@ TIERS = [
     'INELIGIBLE'
 ]
 TIER_MAP = {t: i for i, t in enumerate(TIERS)}
+CHUNK_SIZE = 75  # 3 pages of 25 students per chunk
 
 def safe_float(val):
     try:
@@ -42,30 +44,41 @@ def safe_float(val):
     except:
         return 0.0
 
+def tokenize(text):
+    if not text:
+        return []
+    words = re.findall(r'[a-zA-Z0-9]+', text.lower())
+    return [w for w in words if len(w) >= 2]
+
 def build():
     print("Loading all student records for leaderboard build...")
-    data_dir = Path(__file__).parent / "data"
+    root_dir = Path(__file__).parent
+    data_dir = root_dir / "data"
     data_dir.mkdir(exist_ok=True)
-    leaderboard_file = data_dir / "leaderboard.json"
+
+    chunks_dir = data_dir / "chunks"
+    chunks_dir.mkdir(exist_ok=True)
+
+    search_dir = data_dir / "search"
+    search_dir.mkdir(exist_ok=True)
+
+    transcripts_dir = data_dir / "transcripts"
+    transcripts_dir.mkdir(exist_ok=True)
 
     with open(MASTER_STUDENT_JSON, 'r', encoding='utf-8') as f:
         students_raw = json.load(f)
 
     print(f"Loaded {len(students_raw):,} student records from master dataset.")
 
-    # Transcripts Map
-    transcripts_dir = data_dir / "transcripts"
-    transcripts_dir.mkdir(exist_ok=True)
     transcripts_map = {}
-
-    # Standardize records
     students = []
+
     for idx, s in enumerate(students_raw):
         name = (s.get('name') or 'STUDENT').strip().upper()
         school = (s.get('institution') or 'UNKNOWN SCHOOL').strip().upper()
         upazila = (s.get('upazila') or 'UNKNOWN').strip().upper()
         district = (s.get('district') or 'UNKNOWN').strip().upper()
-        
+
         grp = (s.get('group') or 'SCIENCE').strip().upper()
         if 'SCIENCE' in grp: grp = 'SCIENCE'
         elif 'HUMANITIES' in grp or 'ARTS' in grp: grp = 'HUMANITIES'
@@ -119,7 +132,7 @@ def build():
         s['globalRank'] = current_rank
         s['id'] = i
 
-    # Compute Scholarship Probability Engine (Ministry / DSHE Quota Simulation)
+    # Compute Scholarship Quotas
     print("Computing Official 50:50 Gender Scholarship Quotas...")
     
     # 1. Talentpool Selection
@@ -138,7 +151,7 @@ def build():
                 s['scholarship_prob'] = 98
                 talentpool_set.add(s['id'])
 
-    # 2. Upazila General Quota Selection (for non-talentpool regular students)
+    # 2. Upazila General Quota Selection
     by_upz_gender = defaultdict(list)
     for s in students:
         if s['id'] not in talentpool_set and s['is_passed'] and s['is_regular'] and s['gpa'] >= 3.00:
@@ -181,7 +194,6 @@ def build():
                 s['scholarship_tier'] = 'INELIGIBLE'
                 s['scholarship_prob'] = 0
 
-    # Default remaining
     for s in students:
         if 'scholarship_tier' not in s:
             s['scholarship_tier'] = 'INELIGIBLE'
@@ -198,15 +210,12 @@ def build():
     sch_map = {s: i for i, s in enumerate(unique_schools)}
     grp_map = {g: i for i, g in enumerate(unique_groups)}
 
-    # Map district to upazilas dictionary for cascaded filtering
     dist_to_upazilas = defaultdict(set)
     for s in students:
         dist_to_upazilas[s['district']].add(s['upazila'])
     dist_upz_dict = {d: sorted(list(upzs)) for d, upzs in dist_to_upazilas.items()}
 
-    print(f"Districts: {len(unique_districts)}, Upazilas: {len(unique_upazilas)}, Schools: {len(unique_schools)}")
-
-    # Compact student rows:
+    # Compact student representation:
     # [id, name, school_idx, upz_idx, dist_idx, grp_idx, gpa, mark, globalRank, is_passed, roll, scholarship_prob, tier_idx, gender (1=M,2=F), is_regular, has_transcript]
     compact_students = []
     for s in students:
@@ -217,7 +226,7 @@ def build():
         t_idx = TIER_MAP.get(s['scholarship_tier'], 6)
         gender_code = 2 if s['gender'] == 'FEMALE' else 1
 
-        compact_students.append([
+        compact_row = [
             s['id'],
             s['name'],
             s_idx,
@@ -234,32 +243,146 @@ def build():
             gender_code,
             s['is_regular'],
             s['has_transcript']
-        ])
+        ]
+        s['compact'] = compact_row
+        compact_students.append(compact_row)
 
-    payload = {
+    print(f"Total students compact encoded: {len(compact_students):,}")
+
+    # Chunking: Write global chunks data/chunks/all/{chunkIndex}.json
+    all_chunks_dir = chunks_dir / "all"
+    all_chunks_dir.mkdir(parents=True, exist_ok=True)
+    num_global_chunks = math.ceil(len(compact_students) / CHUNK_SIZE)
+
+    print(f"Writing {num_global_chunks} global chunks ({CHUNK_SIZE} students per chunk)...")
+    for c_idx in range(num_global_chunks):
+        start = c_idx * CHUNK_SIZE
+        end = min(start + CHUNK_SIZE, len(compact_students))
+        chunk_data = compact_students[start:end]
+        chunk_path = all_chunks_dir / f"{c_idx}.json"
+        chunk_path.write_text(json.dumps(chunk_data, separators=(',', ':'), ensure_ascii=False), encoding='utf-8')
+
+    # Calculate Scoped Group & District counts
+    scope_totals = defaultdict(int)
+    scope_students = defaultdict(list)
+
+    for s in students:
+        d = s['district']
+        u = s['upazila']
+        g = s['group']
+        c = s['compact']
+
+        scope_totals['ALL_ALL'] += 1
+        
+        scope_totals[f"{d}_ALL"] += 1
+        scope_students[f"{d}_ALL"].append(c)
+
+        scope_totals[f"ALL_{g}"] += 1
+        scope_students[f"ALL_{g}"].append(c)
+
+        scope_totals[f"{d}_{g}"] += 1
+        scope_students[f"{d}_{g}"].append(c)
+
+        scope_totals[f"{d}_{u}_ALL"] += 1
+        scope_students[f"{d}_{u}_ALL"].append(c)
+
+        scope_totals[f"{d}_{u}_{g}"] += 1
+        scope_students[f"{d}_{u}_{g}"].append(c)
+
+    # Write scoped chunks for instant filtered browsing
+    print("Writing scoped chunks for districts, upazilas, and groups...")
+    for scope_key, rows in scope_students.items():
+        safe_scope_dir = chunks_dir / scope_key.replace(' ', '_')
+        safe_scope_dir.mkdir(parents=True, exist_ok=True)
+        n_chunks = math.ceil(len(rows) / CHUNK_SIZE)
+        for c_idx in range(n_chunks):
+            start = c_idx * CHUNK_SIZE
+            end = min(start + CHUNK_SIZE, len(rows))
+            chunk_data = rows[start:end]
+            (safe_scope_dir / f"{c_idx}.json").write_text(
+                json.dumps(chunk_data, separators=(',', ':'), ensure_ascii=False),
+                encoding='utf-8'
+            )
+
+    # Initial Students (First 75 items = 3 pages for instant 0ms first render)
+    initial_students = compact_students[:CHUNK_SIZE]
+
+    # Overall Board Statistics
+    gpa5_count = sum(1 for s in students if s['gpa'] == 5.0)
+    meta_payload = {
         "districts": unique_districts,
         "upazilas": unique_upazilas,
         "district_upazilas": dist_upz_dict,
         "schools": unique_schools,
         "groups": unique_groups,
         "tiers": TIERS,
-        "students": compact_students
+        "chunk_size": CHUNK_SIZE,
+        "total_students": len(compact_students),
+        "total_chunks": num_global_chunks,
+        "scope_totals": {k.replace(' ', '_'): v for k, v in scope_totals.items()},
+        "stats": {
+            "total_students": len(compact_students),
+            "total_schools": len(unique_schools),
+            "total_gpa5": gpa5_count,
+            "total_districts": len(unique_districts)
+        },
+        "initial_students": initial_students
     }
 
-    # Write minified JSON
-    print("Writing compressed leaderboard.json...")
-    payload_str = json.dumps(payload, separators=(',', ':'), ensure_ascii=False)
-    leaderboard_file.write_text(payload_str, encoding="utf-8")
+    print("Writing compressed leaderboard_meta.json...")
+    meta_file = data_dir / "leaderboard_meta.json"
+    meta_str = json.dumps(meta_payload, separators=(',', ':'), ensure_ascii=False)
+    meta_file.write_text(meta_str, encoding="utf-8")
+    meta_kb = len(meta_str.encode("utf-8")) / 1024
+    print(f"leaderboard_meta.json created: {meta_kb:.1f} KB (Loads in ~15ms!)")
 
-    size_mb = len(payload_str.encode("utf-8")) / (1024 * 1024)
-    print(f"Generated {leaderboard_file.name} successfully!")
-    print(f"Total students indexed: {len(students):,}")
-    print(f"File size: {size_mb:.2f} MB")
+    # Also keep backward-compatible leaderboard.json as meta + initial chunks
+    leaderboard_file = data_dir / "leaderboard.json"
+    leaderboard_file.write_text(meta_str, encoding="utf-8")
 
-    # Export chunked transcript JSONs (grouped by 3-digit roll prefix for speed and clean filesystem)
+    # Build Search Shards by 2-character prefixes for lightning-fast search
+    print("Building instant search index shards...")
+    search_shards = defaultdict(list)
+    seen_in_shard = defaultdict(set)
+
+    for s in students:
+        c = s['compact']
+        s_id = s['id']
+        tokens = set()
+
+        # Roll prefixes
+        roll = s['roll']
+        if roll:
+            if len(roll) >= 2: tokens.add(roll[:2].lower())
+            if len(roll) >= 3: tokens.add(roll[:3].lower())
+
+        # Name tokens
+        for word in tokenize(s['name']):
+            if len(word) >= 2: tokens.add(word[:2])
+
+        # School tokens
+        for word in tokenize(s['school']):
+            if len(word) >= 2: tokens.add(word[:2])
+
+        # Upazila tokens
+        for word in tokenize(s['upazila']):
+            if len(word) >= 2: tokens.add(word[:2])
+
+        for tok in tokens:
+            if s_id not in seen_in_shard[tok]:
+                seen_in_shard[tok].add(s_id)
+                search_shards[tok].append(c)
+
+    print(f"Exporting {len(search_shards):,} search shard files...")
+    for prefix, rows in search_shards.items():
+        # Sanitize filename
+        safe_prefix = re.sub(r'[^a-zA-Z0-9_-]', '', prefix)
+        if not safe_prefix: continue
+        shard_path = search_dir / f"{safe_prefix}.json"
+        shard_path.write_text(json.dumps(rows, separators=(',', ':'), ensure_ascii=False), encoding='utf-8')
+
+    # Export chunked transcripts (grouped by 3-digit roll prefix)
     print("Grouping transcripts by 3-digit roll prefix...")
-    transcripts_dir.mkdir(exist_ok=True)
-
     prefix_map = defaultdict(dict)
     for roll, sub_list in transcripts_map.items():
         prefix = roll[:3] if len(roll) >= 3 else 'other'
@@ -268,10 +391,9 @@ def build():
     print(f"Exporting {len(prefix_map)} transcript chunk files for {len(transcripts_map):,} examinees...")
     for prefix, rolls_dict in prefix_map.items():
         chunk_file = transcripts_dir / f"{prefix}.json"
-        with open(chunk_file, 'w', encoding='utf-8') as f:
-            json.dump(rolls_dict, f, ensure_ascii=False, separators=(',', ':'))
+        chunk_file.write_text(json.dumps(rolls_dict, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
 
-    print(f"Transcripts successfully saved to {transcripts_dir} ({len(prefix_map)} chunk files)")
+    print("All chunks, search shards, transcripts, and metadata generated successfully!")
 
 if __name__ == "__main__":
     build()
