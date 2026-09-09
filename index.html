@@ -38,8 +38,21 @@
       href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,1,0&display=swap"
+      rel="stylesheet"
+    />
 
     <link rel="canonical" href="https://ssc2026.hscstack.site/" />
+
+    <style>
+      .material-symbols-rounded {
+        font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        display: inline-block;
+        line-height: 1;
+        user-select: none;
+      }
+    </style>
 
     <script>
       tailwind.config = {
@@ -58,11 +71,190 @@
       };
     </script>
   </head>
-  <body class="relative bg-[#f8fafc] text-slate-900 font-sans antialiased">
-    <!-- User Profile Widget (HSCStack Auth) -->
-    <div id="user-profile-widget" class="absolute top-4 right-4 sm:top-6 sm:right-6 z-40"></div>
+  <body class="relative bg-[#f8fafc] text-slate-900 font-sans antialiased pb-[calc(4.5rem+env(safe-area-inset-bottom))] sm:pb-0">
+    <!-- Top Navigation Bar (Native HSCStack Topbar) -->
+    <header class="sticky top-0 z-40 w-full border-b border-slate-200/70 bg-white/90 backdrop-blur-xl transition-colors">
+      <div class="mx-auto flex h-14 sm:h-16 max-w-7xl items-center justify-between px-3.5 sm:px-6">
+        <!-- Left: Hamburger & Logo -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          <button
+            type="button"
+            id="mobile-drawer-toggle"
+            class="flex h-9 w-9 items-center justify-center rounded-full text-slate-700 hover:bg-slate-100 hover:text-slate-900 active:bg-slate-200 sm:hidden transition-colors"
+            aria-label="Open navigation menu"
+          >
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="4" y1="6" x2="20" y2="6"></line>
+              <line x1="4" y1="12" x2="20" y2="12"></line>
+              <line x1="4" y1="18" x2="20" y2="18"></line>
+            </svg>
+          </button>
 
-    <div class="px-6 pt-16 pb-3 text-center sm:pt-24 sm:pb-6">
+          <a href="https://hscstack.site" class="flex items-center gap-2.5">
+            <div class="flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-slate-900 shadow-sm">
+              <svg width="22" height="22" viewBox="0 0 166 166" fill="none" xmlns="http://www.w3.org/2000/svg" class="scale-110">
+                <rect width="166" height="166" rx="36" fill="#0F172A"/>
+                <path d="M83 34L38 56.5L83 79L128 56.5L83 34Z" fill="#818CF8"/>
+                <path d="M38 83L83 105.5L128 83" stroke="#E0E7FF" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M38 108L83 130.5L128 108" stroke="#38BDF8" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M83 34L38 56.5L83 79L128 56.5L83 34Z" stroke="#FFFFFF" stroke-width="8" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <span class="text-lg font-extrabold tracking-tight text-slate-900">
+              HSC<span class="text-indigo-600">Stack</span>
+            </span>
+          </a>
+        </div>
+
+        <!-- Center: Primary Desktop Links -->
+        <nav class="hidden sm:flex items-center gap-1">
+          <a
+            href="https://hscstack.site"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[13px] font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-colors"
+          >
+            <span class="material-symbols-rounded text-slate-500 text-[20px]">home</span>
+            <span>Home</span>
+          </a>
+          <a
+            href="https://hscstack.site/forum"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[13px] font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-colors"
+          >
+            <span class="material-symbols-rounded text-slate-500 text-[20px]">forum</span>
+            <span>Forum</span>
+          </a>
+          <a
+            href="https://hscstack.site/chat"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[13px] font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-colors"
+          >
+            <span class="material-symbols-rounded text-slate-500 text-[20px]">chat</span>
+            <span>Chat</span>
+          </a>
+          <a
+            href="https://hscstack.site/blogs"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[13px] font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 transition-colors"
+          >
+            <span class="material-symbols-rounded text-slate-500 text-[20px]">menu_book</span>
+            <span>Blogs</span>
+          </a>
+        </nav>
+
+        <!-- Right: Profile / Login Widget -->
+        <div class="flex items-center gap-2">
+          <div id="user-profile-widget" class="flex items-center"></div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile Slide-Over Drawer -->
+    <div id="mobile-drawer" class="fixed inset-0 z-50 hidden">
+      <div id="mobile-drawer-backdrop" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
+      <aside id="mobile-drawer-panel" class="relative flex h-full w-[84%] max-w-[320px] flex-col border-r border-slate-200/60 bg-white/95 shadow-2xl backdrop-blur-xl transform -translate-x-full transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]">
+        <!-- Drawer Header -->
+        <div class="flex h-16 shrink-0 items-center justify-between border-b border-slate-200/60 px-4">
+          <a href="https://hscstack.site" class="flex items-center gap-2.5">
+            <div class="flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-slate-900 shadow-sm">
+              <svg width="22" height="22" viewBox="0 0 166 166" fill="none" xmlns="http://www.w3.org/2000/svg" class="scale-110">
+                <rect width="166" height="166" rx="36" fill="#0F172A"/>
+                <path d="M83 34L38 56.5L83 79L128 56.5L83 34Z" fill="#818CF8"/>
+                <path d="M38 83L83 105.5L128 83" stroke="#E0E7FF" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M38 108L83 130.5L128 108" stroke="#38BDF8" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M83 34L38 56.5L83 79L128 56.5L83 34Z" stroke="#FFFFFF" stroke-width="8" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <span class="text-lg font-extrabold tracking-tight text-slate-900">
+              HSC<span class="text-indigo-600">Stack</span>
+            </span>
+          </a>
+          <button id="mobile-drawer-close" class="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900" aria-label="Close menu">
+            <span class="material-symbols-rounded text-slate-600 text-[20px]">close</span>
+          </button>
+        </div>
+
+        <!-- Drawer Body -->
+        <div class="flex-1 overflow-y-auto py-3.5 px-2.5">
+          <!-- MORE Section -->
+          <p class="mb-2 px-3 text-[10px] font-bold tracking-[0.12em] text-slate-400 uppercase">MORE</p>
+          <nav class="space-y-0.5">
+            <a href="https://hscstack.site/ai" class="group flex items-center gap-3 rounded-[10px] px-2.5 py-2 text-[13px] font-medium tracking-tight text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 transition-colors">
+              <span class="material-symbols-rounded text-slate-500 group-hover:text-slate-700 text-[22px]">smart_toy</span>
+              <span>AI</span>
+            </a>
+            <a href="https://hscstack.site/support" class="group flex items-center gap-3 rounded-[10px] px-2.5 py-2 text-[13px] font-medium tracking-tight text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 transition-colors">
+              <span class="material-symbols-rounded text-slate-500 group-hover:text-slate-700 text-[22px]">help</span>
+              <span>Support Center</span>
+            </a>
+            <a href="https://hscstack.site/donate" class="group flex items-center gap-3 rounded-[10px] px-2.5 py-2 text-[13px] font-medium tracking-tight text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 transition-colors">
+              <span class="material-symbols-rounded text-slate-500 group-hover:text-slate-700 text-[22px]">volunteer_activism</span>
+              <span>Donate</span>
+            </a>
+          </nav>
+
+          <!-- PLATFORM Section -->
+          <div class="mt-4 border-t border-slate-100 pt-3">
+            <p class="mb-2 px-3 text-[10px] font-bold tracking-[0.12em] text-slate-400 uppercase">PLATFORM</p>
+            <nav class="space-y-0.5">
+              <a href="https://hscstack.site/about-us" class="group flex items-center gap-3 rounded-[10px] px-2.5 py-2 text-[13px] font-medium tracking-tight text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 transition-colors">
+                <span class="material-symbols-rounded text-slate-500 group-hover:text-slate-700 text-[22px]">groups</span>
+                <span>About Us</span>
+              </a>
+              <a href="https://hscstack.site/join" class="group flex items-center gap-3 rounded-[10px] px-2.5 py-2 text-[13px] font-medium tracking-tight text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 transition-colors">
+                <span class="material-symbols-rounded text-slate-500 group-hover:text-slate-700 text-[22px]">person_add</span>
+                <span>Join Our Team</span>
+              </a>
+              <a href="#" id="drawer-takedown-btn" class="group flex items-center gap-3 rounded-[10px] px-2.5 py-2 text-[13px] font-medium tracking-tight text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 transition-colors">
+                <span class="material-symbols-rounded text-slate-500 group-hover:text-slate-700 text-[22px]">shield</span>
+                <span>Takedown Request</span>
+              </a>
+            </nav>
+          </div>
+
+          <!-- Legal Links & Credits Footer -->
+          <div class="mt-4 border-t border-slate-100 px-3 pt-3 space-y-2">
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-medium text-slate-400">
+              <a href="privacy_policy.html" class="hover:text-slate-700 transition">Privacy</a>
+              <span>•</span>
+              <a href="https://hscstack.site/terms-service" class="hover:text-slate-700 transition">Terms</a>
+              <span>•</span>
+              <a href="https://hscstack.site/content-policy" class="hover:text-slate-700 transition">Content Policy</a>
+            </div>
+            <p class="text-[11px] text-slate-400 font-medium">
+              Built by
+              <a href="https://hscstack.site/u/trtajim" target="_blank" rel="noopener noreferrer" class="font-bold text-slate-600 hover:text-indigo-600 transition">Tajim</a>
+              &
+              <a href="https://hscstack.site/u/labib_design" target="_blank" rel="noopener noreferrer" class="font-bold text-slate-600 hover:text-indigo-600 transition">Labib</a>
+            </p>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Mobile Bottom Navigation Bar (Home, Forum, Chat, Blogs, Account) -->
+    <nav class="sm:hidden fixed inset-x-0 bottom-0 z-40 w-full border-t border-slate-200/70 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl" aria-label="Bottom navigation">
+      <div class="mx-auto flex w-full max-w-md items-center justify-around px-1 py-1.5">
+        <a href="https://hscstack.site" class="flex min-w-0 flex-1 flex-col items-center gap-0.5 rounded-xl px-2 py-1 text-slate-500 hover:text-slate-900 transition-colors">
+          <span class="material-symbols-rounded text-[24px]">home</span>
+          <span class="text-[10px] font-medium leading-none tracking-wide">Home</span>
+        </a>
+        <a href="https://hscstack.site/forum" class="flex min-w-0 flex-1 flex-col items-center gap-0.5 rounded-xl px-2 py-1 text-slate-500 hover:text-slate-900 transition-colors">
+          <span class="material-symbols-rounded text-[24px]">forum</span>
+          <span class="text-[10px] font-medium leading-none tracking-wide">Forum</span>
+        </a>
+        <a href="https://hscstack.site/chat" class="flex min-w-0 flex-1 flex-col items-center gap-0.5 rounded-xl px-2 py-1 text-slate-500 hover:text-slate-900 transition-colors">
+          <span class="material-symbols-rounded text-[24px]">chat</span>
+          <span class="text-[10px] font-medium leading-none tracking-wide">Chat</span>
+        </a>
+        <a href="https://hscstack.site/blogs" class="flex min-w-0 flex-1 flex-col items-center gap-0.5 rounded-xl px-2 py-1 text-slate-500 hover:text-slate-900 transition-colors">
+          <span class="material-symbols-rounded text-[24px]">menu_book</span>
+          <span class="text-[10px] font-medium leading-none tracking-wide">Blogs</span>
+        </a>
+        <a href="https://hscstack.site/login" id="bottom-nav-account" class="flex min-w-0 flex-1 flex-col items-center gap-0.5 rounded-xl px-2 py-1 text-slate-500 hover:text-slate-900 transition-colors">
+          <span id="bottom-nav-account-icon" class="material-symbols-rounded text-[24px]">login</span>
+          <span id="bottom-nav-account-label" class="text-[10px] font-medium leading-none tracking-wide">Login</span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="px-6 pt-8 pb-3 text-center sm:pt-12 sm:pb-6">
       <div class="mx-auto max-w-3xl">
         <div
           class="inline-flex items-center gap-2 px-4 py-1.5 mb-6 rounded-full bg-slate-100 border border-slate-200 text-slate-600 font-semibold text-sm transition-colors hover:bg-slate-200"
@@ -630,7 +822,7 @@
       </div>
     </main>
 
-    <footer class="mt-4 py-10 border-t border-slate-200 bg-white">
+    <footer class="hidden sm:block mt-4 py-10 border-t border-slate-200 bg-white">
       <div class="max-w-5xl mx-auto px-4 sm:px-6">
         <div
           class="flex flex-col sm:flex-row justify-between items-center gap-4"
@@ -989,7 +1181,7 @@
     <!-- Takedown Modal -->
     <div
       id="takedown-modal"
-      class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 opacity-0 pointer-events-none transition-all duration-300 hidden p-4"
+      class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-[60] opacity-0 pointer-events-none transition-all duration-300 hidden p-4"
     >
       <div
         class="bg-white rounded-3xl w-full max-w-sm shadow-2xl transform translate-y-8 transition-all duration-300 overflow-hidden scale-95 flex flex-col p-6 text-center"
