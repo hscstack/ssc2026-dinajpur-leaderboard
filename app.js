@@ -377,22 +377,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderUserProfileWidget() {
     const container = document.getElementById('user-profile-widget');
-    const bottomNavAccount = document.getElementById('bottom-nav-account');
-    const bottomNavIcon = document.getElementById('bottom-nav-account-icon');
-    const bottomNavLabel = document.getElementById('bottom-nav-account-label');
     const drawerAccountLink = document.getElementById('drawer-account-link');
     const drawerAccountLabel = document.getElementById('drawer-account-label');
 
     if (!isLoggedIn || !currentUser) {
-      if (bottomNavAccount) {
-        bottomNavAccount.href = 'https://hscstack.site/login';
-      }
-      if (bottomNavIcon) {
-        bottomNavIcon.textContent = 'login';
-      }
-      if (bottomNavLabel) {
-        bottomNavLabel.textContent = 'Login';
-      }
       if (drawerAccountLink) {
         drawerAccountLink.href = 'https://hscstack.site/login';
       }
@@ -433,15 +421,6 @@ document.addEventListener('DOMContentLoaded', () => {
       : 'https://hscstack.site/profile';
     const initial = name.trim().charAt(0).toUpperCase() || 'U';
 
-    if (bottomNavAccount) {
-      bottomNavAccount.href = profileUrl;
-    }
-    if (bottomNavIcon) {
-      bottomNavIcon.textContent = 'account_circle';
-    }
-    if (bottomNavLabel) {
-      bottomNavLabel.textContent = 'Account';
-    }
     if (drawerAccountLink) {
       drawerAccountLink.href = profileUrl;
     }
