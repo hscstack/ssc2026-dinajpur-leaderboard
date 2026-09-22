@@ -51,6 +51,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalRoll = document.getElementById('modal-roll');
   const modalGpa = document.getElementById('modal-gpa');
   const modalMarks = document.getElementById('modal-marks');
+  const modalChallengeBox = document.getElementById('modal-challenge-box');
+  const modalChallengeIcon = document.getElementById('modal-challenge-icon');
+  const modalChallengeBadge = document.getElementById('modal-challenge-badge');
+  const modalChallengeText = document.getElementById('modal-challenge-text');
   const modalGradesSection = document.getElementById('modal-grades-section');
   const modalGrades = document.getElementById('modal-grades');
   const modalStudentHeader = document.getElementById('modal-student-header');
@@ -154,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
       groupsList = indexData.groups || [];
 
       // Unpack compact rows:
-      // [id, name, school_idx, upz_idx, dist_idx, grp_idx, gpa, mark, globalRank, is_passed, roll]
+      // [id, name, school_idx, upz_idx, dist_idx, grp_idx, gpa, mark, globalRank, is_passed, roll, is_result_changed]
       rawData = (indexData.students || []).map(row => {
         const schoolName = row[2] >= 0 ? schoolsList[row[2]] : '';
         const upazilaName = row[3] >= 0 ? upazilasList[row[3]] : '';
@@ -173,6 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
           globalRank: row[8],
           status: row[9] === 1 ? 'PASSED' : 'FAILED',
           roll: row[10] || '',
+          is_result_changed_after_board_challenge: row[11] === 1 || row[11] === true || false,
           grades: null // loaded on demand when modal opens
         };
       });
@@ -1025,6 +1030,36 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       modalRollRow.classList.add('hidden');
       modalRollRow.classList.remove('flex');
+    }
+
+    if (modalChallengeBox && modalChallengeBadge && modalChallengeText && modalChallengeIcon) {
+      const isChanged = Boolean(student.is_result_changed_after_board_challenge);
+      if (isChanged) {
+        modalChallengeBox.className = 'p-3.5 rounded-2xl border bg-emerald-50/80 border-emerald-200/80 flex items-start gap-3';
+        modalChallengeBadge.className = 'text-[11px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800';
+        modalChallengeBadge.textContent = 'Result Changed';
+        modalChallengeText.className = 'text-xs font-semibold text-emerald-900 leading-relaxed';
+        modalChallengeText.textContent = 'This is the updated marks after board challenge.';
+        modalChallengeIcon.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-600 shrink-0">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        `;
+      } else {
+        modalChallengeBox.className = 'p-3.5 rounded-2xl border bg-amber-50/80 border-amber-200/70 flex items-start gap-3';
+        modalChallengeBadge.className = 'text-[11px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md bg-amber-100 text-amber-800';
+        modalChallengeBadge.textContent = 'Notice';
+        modalChallengeText.className = 'text-xs font-semibold text-amber-900 leading-relaxed';
+        modalChallengeText.textContent = 'This data is collected before board challenge, data might be changed.';
+        modalChallengeIcon.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-amber-600 shrink-0">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        `;
+      }
     }
 
     // Lazy load grades if not already loaded

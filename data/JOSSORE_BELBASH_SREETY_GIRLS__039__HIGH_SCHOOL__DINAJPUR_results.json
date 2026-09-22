@@ -22,7 +22,8 @@
       "CAREER EDUCATION CA": "A+"
     },
     "school": "JOSSORE BELBASH SREETY GIRLS&#039; HIGH SCHOOL, DINAJPUR",
-    "district": "DINAJPUR"
+    "district": "DINAJPUR",
+    "is_result_changed_after_board_challenge": false
   },
   {
     "name": "MST SHILPA AKTHER SHATHI",
@@ -47,7 +48,8 @@
       "CAREER EDUCATION CA": "A+"
     },
     "school": "JOSSORE BELBASH SREETY GIRLS&#039; HIGH SCHOOL, DINAJPUR",
-    "district": "DINAJPUR"
+    "district": "DINAJPUR",
+    "is_result_changed_after_board_challenge": false
   },
   {
     "name": "MST SINTHIYA AKTER",
@@ -72,7 +74,8 @@
       "CAREER EDUCATION CA": "A+"
     },
     "school": "JOSSORE BELBASH SREETY GIRLS&#039; HIGH SCHOOL, DINAJPUR",
-    "district": "DINAJPUR"
+    "district": "DINAJPUR",
+    "is_result_changed_after_board_challenge": false
   },
   {
     "name": "SMRITY RANI",
@@ -97,7 +100,8 @@
       "CAREER EDUCATION CA": "A+"
     },
     "school": "JOSSORE BELBASH SREETY GIRLS&#039; HIGH SCHOOL, DINAJPUR",
-    "district": "DINAJPUR"
+    "district": "DINAJPUR",
+    "is_result_changed_after_board_challenge": false
   },
   {
     "name": "SUSRE RANI ROY",
@@ -122,6 +126,7 @@
       "CAREER EDUCATION CA": "A+"
     },
     "school": "JOSSORE BELBASH SREETY GIRLS&#039; HIGH SCHOOL, DINAJPUR",
-    "district": "DINAJPUR"
+    "district": "DINAJPUR",
+    "is_result_changed_after_board_challenge": false
   }
 ]

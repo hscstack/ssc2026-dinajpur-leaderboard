@@ -70,6 +70,8 @@ def build():
             if sub_grades and len(sub_grades) > 0 and roll:
                 transcripts_map[roll] = sub_grades
 
+            is_result_changed = 1 if s.get('is_result_changed_after_board_challenge') is True else 0
+
             students.append({
                 'name': name,
                 'school': school,
@@ -79,7 +81,8 @@ def build():
                 'gpa': gpa,
                 'mark': mark,
                 'is_passed': is_passed,
-                'roll': roll
+                'roll': roll,
+                'is_result_changed_after_board_challenge': is_result_changed
             })
 
         # Sort descending: GPA first, then Total Marks, then Roll
@@ -111,7 +114,7 @@ def build():
         dist_upz_dict = {d: sorted(list(upzs)) for d, upzs in dist_to_upazilas.items()}
 
         # Compact student rows:
-        # [id, name, school_idx, upz_idx, dist_idx, grp_idx, gpa, mark, globalRank, is_passed, roll]
+        # [id, name, school_idx, upz_idx, dist_idx, grp_idx, gpa, mark, globalRank, is_passed, roll, is_result_changed]
         compact_students = []
         for s in students:
             compact_students.append([
@@ -125,7 +128,8 @@ def build():
                 s['mark'],
                 s['globalRank'],
                 s['is_passed'],
-                s['roll']
+                s['roll'],
+                s.get('is_result_changed_after_board_challenge', 0)
             ])
 
         payload = {

@@ -22,7 +22,8 @@
       "CAREER EDUCATION CA": "A+"
     },
     "school": "BOSNOB DUSH HIGH SCHOOL, GAIBANDHA",
-    "district": "GAIBANDHA"
+    "district": "GAIBANDHA",
+    "is_result_changed_after_board_challenge": false
   },
   {
     "name": "MD SEEAM MIA",
@@ -47,7 +48,8 @@
       "CAREER EDUCATION CA": "A+"
     },
     "school": "BOSNOB DUSH HIGH SCHOOL, GAIBANDHA",
-    "district": "GAIBANDHA"
+    "district": "GAIBANDHA",
+    "is_result_changed_after_board_challenge": false
   },
   {
     "name": "MD. ANAMUL HAQUE",
@@ -72,7 +74,8 @@
       "CAREER EDUCATION CA": "A+"
     },
     "school": "BOSNOB DUSH HIGH SCHOOL, GAIBANDHA",
-    "district": "GAIBANDHA"
+    "district": "GAIBANDHA",
+    "is_result_changed_after_board_challenge": false
   },
   {
     "name": "MST BILASI AKTER",
@@ -97,6 +100,7 @@
       "CAREER EDUCATION CA": "A+"
     },
     "school": "BOSNOB DUSH HIGH SCHOOL, GAIBANDHA",
-    "district": "GAIBANDHA"
+    "district": "GAIBANDHA",
+    "is_result_changed_after_board_challenge": false
   }
 ]
