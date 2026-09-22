@@ -340,7 +340,7 @@
   {
     "name": "AFIA AFRIN SARAH",
     "gpa": 5.0,
-    "mark": 1020,
+    "mark": 1024,
     "status": "PASSED",
     "group": "SCIENCE",
     "grades": {
@@ -361,7 +361,7 @@
     },
     "school": "CANTONMENT PUBLIC SCHOOL &amp; COLLEGE, RANGPUR",
     "district": "RANGPUR",
-    "is_result_changed_after_board_challenge": false
+    "is_result_changed_after_board_challenge": true
   },
   {
     "name": "AFIYA MUBASSHIRA MUSKAN",
